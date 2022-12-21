@@ -4,6 +4,7 @@ using System.Transactions;
 namespace DotnetCoreTemplate.Application.Shared.Decorators;
 
 public class TransactionCommandServiceDecorator<TCommand, TResult> : ICommandService<TCommand, TResult>
+	where TCommand : ICommand<TResult>
 {
 	private readonly ICommandService<TCommand, TResult> _decoratee;
 

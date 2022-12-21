@@ -4,6 +4,7 @@ using ValidationException = DotnetCoreTemplate.Application.Shared.Exceptions.Val
 namespace DotnetCoreTemplate.Application.Shared.Decorators;
 
 public class ValidationCommandServiceDecorator<TCommand, TResult> : ICommandService<TCommand, TResult>
+	where TCommand : ICommand<TResult>
 {
 	private readonly ICommandService<TCommand, TResult> _decoratee;
 	private readonly IDomainValidator<TCommand> _validator;

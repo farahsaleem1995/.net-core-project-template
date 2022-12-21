@@ -1,3 +1,5 @@
-﻿namespace DotnetCoreTemplate.Application.TodoItems.Commands.CreateTodoItem;
+﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
 
-public record CreateTodoItemCommand(string Title, string Description);
+namespace DotnetCoreTemplate.Application.TodoItems.Commands.CreateTodoItem;
+
+public record CreateTodoItemCommand(string Title, string Description) : ICommand<int>;

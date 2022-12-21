@@ -1,3 +1,5 @@
-﻿namespace DotnetCoreTemplate.Application.TodoItems.Commands.SetTodoItemAsDoing;
+﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
 
-public record SetTodoItemAsDoingCommand(int Id);
+namespace DotnetCoreTemplate.Application.TodoItems.Commands.SetTodoItemAsDoing;
+
+public record SetTodoItemAsDoingCommand(int Id) : ICommand;

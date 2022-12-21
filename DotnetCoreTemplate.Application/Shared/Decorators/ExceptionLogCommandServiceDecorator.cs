@@ -4,37 +4,38 @@ using DotnetCoreTemplate.Application.Shared.Interfaces;
 namespace DotnetCoreTemplate.Application.Shared.Decorators;
 
 public class ExceptionLogCommandServiceDecorator<TCommand, TResult> : ICommandService<TCommand, TResult>
+	where TCommand : ICommand<TResult>
 {
-    private readonly ICommandService<TCommand, TResult> _decoratee;
-    private readonly IDomainLogger _logger;
+	private readonly ICommandService<TCommand, TResult> _decoratee;
+	private readonly IDomainLogger _logger;
 
-    public ExceptionLogCommandServiceDecorator(
-        ICommandService<TCommand, TResult> decoratee,
-        IDomainLogger logger)
-    {
-        _decoratee = decoratee;
-        _logger = logger;
-    }
+	public ExceptionLogCommandServiceDecorator(
+		ICommandService<TCommand, TResult> decoratee,
+		IDomainLogger logger)
+	{
+		_decoratee = decoratee;
+		_logger = logger;
+	}
 
-    public async Task<TResult> Execute(TCommand command, CancellationToken cancellation)
-    {
-        try
-        {
-            return await _decoratee.Execute(command, cancellation);
-        }
-        catch (Exception e)
-        {
-            LogException(e);
+	public async Task<TResult> Execute(TCommand command, CancellationToken cancellation)
+	{
+		try
+		{
+			return await _decoratee.Execute(command, cancellation);
+		}
+		catch (Exception e)
+		{
+			LogException(e);
 
-            throw;
-        }
-    }
+			throw;
+		}
+	}
 
-    private void LogException(Exception e)
-    {
-        if (e.GetType() != typeof(DomainException))
-        {
-            _logger.LogException(e);
-        }
-    }
+	private void LogException(Exception e)
+	{
+		if (e.GetType() != typeof(DomainException))
+		{
+			_logger.LogException(e);
+		}
+	}
 }

@@ -2,9 +2,10 @@
 using DotnetCoreTemplate.Application.Shared.Models;
 using SimpleInjector;
 
-namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Utils;
+namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Adapters;
 
 public class UnitCommandAdapter<TCommand> : ICommandService<TCommand>
+	where TCommand : ICommand
 {
 	private readonly Container _container;
 

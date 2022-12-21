@@ -5,6 +5,7 @@ using DotnetCoreTemplate.Application.TodoItems.Commands.SetTodoItemAsDoing;
 using DotnetCoreTemplate.Application.TodoItems.Commands.SetTodoItemAsDone;
 using DotnetCoreTemplate.Application.TodoItems.Commands.SetTodoItemAsToDo;
 using DotnetCoreTemplate.Application.TodoItems.Commands.UpdateTodoItem;
+using DotnetCoreTemplate.WebAPI.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DotnetCoreTemplate.WebAPI.Controllers;
@@ -13,31 +14,18 @@ namespace DotnetCoreTemplate.WebAPI.Controllers;
 [Route("[controller]")]
 public class TodosController : Controller
 {
-	private readonly ICommandService<CreateTodoItemCommand, int> _createTodoItemService;
-	private readonly ICommandService<UpdateTodoItemCommand> _updateTodoItemService;
-	private readonly ICommandService<SetTodoItemAsToDoCommand> _setTodoItemAsToDoService;
-	private readonly ICommandService<SetTodoItemAsDoingCommand> _setTodoItemAsDoingService;
-	private readonly ICommandService<SetTodoItemAsDoneCommand> _setTodoItemAsDoneService;
+	private readonly ICommandDirector _commandDirector;
 
-	public TodosController(
-		ICommandService<CreateTodoItemCommand, int> createTodoItemService,
-		ICommandService<UpdateTodoItemCommand> updateTodoItemService,
-		ICommandService<SetTodoItemAsToDoCommand> setTodoItemAsToDoService,
-		ICommandService<SetTodoItemAsDoingCommand> setTodoItemAsDoingService,
-		ICommandService<SetTodoItemAsDoneCommand> setTodoItemAsDoneService)
+	public TodosController(ICommandDirector commandDirector)
 	{
-		_createTodoItemService = createTodoItemService;
-		_updateTodoItemService = updateTodoItemService;
-		_setTodoItemAsToDoService = setTodoItemAsToDoService;
-		_setTodoItemAsDoingService = setTodoItemAsDoingService;
-		_setTodoItemAsDoneService = setTodoItemAsDoneService;
+		_commandDirector = commandDirector;
 	}
 
 	[HttpPost]
 	public async Task<IActionResult> Create([FromBody] CreateTodoItemCommand command,
 		CancellationToken cancellation)
 	{
-		var id = await _createTodoItemService.Execute(command, cancellation);
+		var id = await _commandDirector.Execute(command, cancellation);
 
 		return Ok(id);
 	}
@@ -46,7 +34,7 @@ public class TodosController : Controller
 	public async Task<IActionResult> Update([FromBody] UpdateTodoItemCommand command,
 		CancellationToken cancellation)
 	{
-		await _updateTodoItemService.Execute(command, cancellation);
+		await _commandDirector.Execute(command, cancellation);
 
 		return NoContent();
 	}
@@ -55,7 +43,7 @@ public class TodosController : Controller
 	public async Task<IActionResult> SetAsToDo([FromBody] SetTodoItemAsToDoCommand command,
 		CancellationToken cancellation)
 	{
-		await _setTodoItemAsToDoService.Execute(command, cancellation);
+		await _commandDirector.Execute(command, cancellation);
 
 		return NoContent();
 	}
@@ -64,7 +52,7 @@ public class TodosController : Controller
 	public async Task<IActionResult> SetAsDoing([FromBody] SetTodoItemAsDoingCommand command,
 		CancellationToken cancellation)
 	{
-		await _setTodoItemAsDoingService.Execute(command, cancellation);
+		await _commandDirector.Execute(command, cancellation);
 
 		return NoContent();
 	}
@@ -73,7 +61,7 @@ public class TodosController : Controller
 	public async Task<IActionResult> SetAsDone([FromBody] SetTodoItemAsDoneCommand command,
 		CancellationToken cancellation)
 	{
-		await _setTodoItemAsDoneService.Execute(command, cancellation);
+		await _commandDirector.Execute(command, cancellation);
 
 		return NoContent();
 	}

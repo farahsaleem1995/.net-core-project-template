@@ -1,3 +1,5 @@
-﻿namespace DotnetCoreTemplate.Application.TodoItems.Commands.UpdateTodoItem;
+﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
 
-public record UpdateTodoItemCommand(int Id, string Title, string Description);
+namespace DotnetCoreTemplate.Application.TodoItems.Commands.UpdateTodoItem;
+
+public record UpdateTodoItemCommand(int Id, string Title, string Description) : ICommand;
