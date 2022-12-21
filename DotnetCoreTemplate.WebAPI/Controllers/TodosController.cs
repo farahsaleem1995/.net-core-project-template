@@ -14,17 +14,17 @@ namespace DotnetCoreTemplate.WebAPI.Controllers;
 public class TodosController : Controller
 {
 	private readonly ICommandService<CreateTodoItemCommand, int> _createTodoItemService;
-	private readonly ICommandService<UpdateTodoItemCommand, Unit> _updateTodoItemService;
-	private readonly ICommandService<SetTodoItemAsToDoCommand, Unit> _setTodoItemAsToDoService;
-	private readonly ICommandService<SetTodoItemAsDoingCommand, Unit> _setTodoItemAsDoingService;
-	private readonly ICommandService<SetTodoItemAsDoneCommand, Unit> _setTodoItemAsDoneService;
+	private readonly ICommandService<UpdateTodoItemCommand> _updateTodoItemService;
+	private readonly ICommandService<SetTodoItemAsToDoCommand> _setTodoItemAsToDoService;
+	private readonly ICommandService<SetTodoItemAsDoingCommand> _setTodoItemAsDoingService;
+	private readonly ICommandService<SetTodoItemAsDoneCommand> _setTodoItemAsDoneService;
 
 	public TodosController(
 		ICommandService<CreateTodoItemCommand, int> createTodoItemService,
-		ICommandService<UpdateTodoItemCommand, Unit> updateTodoItemService,
-		ICommandService<SetTodoItemAsToDoCommand, Unit> setTodoItemAsToDoService,
-		ICommandService<SetTodoItemAsDoingCommand, Unit> setTodoItemAsDoingService,
-		ICommandService<SetTodoItemAsDoneCommand, Unit> setTodoItemAsDoneService)
+		ICommandService<UpdateTodoItemCommand> updateTodoItemService,
+		ICommandService<SetTodoItemAsToDoCommand> setTodoItemAsToDoService,
+		ICommandService<SetTodoItemAsDoingCommand> setTodoItemAsDoingService,
+		ICommandService<SetTodoItemAsDoneCommand> setTodoItemAsDoneService)
 	{
 		_createTodoItemService = createTodoItemService;
 		_updateTodoItemService = updateTodoItemService;

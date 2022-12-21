@@ -4,6 +4,7 @@ using DotnetCoreTemplate.Application.Shared.Services;
 using DotnetCoreTemplate.Infrastructure.Persistence;
 using DotnetCoreTemplate.Infrastructure.Persistence.Interfaces;
 using DotnetCoreTemplate.Infrastructure.Persistence.Services;
+using DotnetCoreTemplate.WebAPI.CompositionRoot.Utils;
 using DotnetCoreTemplate.WebAPI.Extensions;
 using DotnetCoreTemplate.WebAPI.Services;
 using FluentValidation;
@@ -88,6 +89,7 @@ public class SimpleInjectorServiceConfigurator
 	private void RegisterApplication()
 	{
 		_container.Register(typeof(ICommandService<,>), typeof(ICommandService<>).Assembly);
+		_container.Register(typeof(ICommandService<>), typeof(UnitCommandAdapter<>));
 
 		_container.Collection.Register(typeof(IValidator<>), typeof(ICommandService<,>).Assembly);
 		_container.Register(typeof(IDomainValidator<>), typeof(FluentCommandValidator<>));
