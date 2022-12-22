@@ -3,21 +3,21 @@ using DotnetCoreTemplate.Application.Shared.Interfaces;
 
 namespace DotnetCoreTemplate.Application.Shared.Decorators;
 
-public class ExceptionLogCommandServiceDecorator<TCommand, TResult> : ICommandService<TCommand, TResult>
-	where TCommand : ICommand<TResult>
+public class ExceptionLogCommandServiceDecorator<TOperation, TResult> : IOperationService<TOperation, TResult>
+	where TOperation : IOperation<TResult>
 {
-	private readonly ICommandService<TCommand, TResult> _decoratee;
-	private readonly IDomainLogger<TCommand> _logger;
+	private readonly IOperationService<TOperation, TResult> _decoratee;
+	private readonly IDomainLogger<TOperation> _logger;
 
 	public ExceptionLogCommandServiceDecorator(
-		ICommandService<TCommand, TResult> decoratee,
-		IDomainLogger<TCommand> logger)
+		IOperationService<TOperation, TResult> decoratee,
+		IDomainLogger<TOperation> logger)
 	{
 		_decoratee = decoratee;
 		_logger = logger;
 	}
 
-	public async Task<TResult> Execute(TCommand command, CancellationToken cancellation)
+	public async Task<TResult> Execute(TOperation command, CancellationToken cancellation)
 	{
 		try
 		{

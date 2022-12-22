@@ -3,17 +3,17 @@ using System.Transactions;
 
 namespace DotnetCoreTemplate.Application.Shared.Decorators;
 
-public class TransactionCommandServiceDecorator<TCommand, TResult> : ICommandService<TCommand, TResult>
-	where TCommand : ICommand<TResult>
+public class TransactionCommandServiceDecorator<TOperation, TResult> : IOperationService<TOperation, TResult>
+	where TOperation : ICommand<TResult>
 {
-	private readonly ICommandService<TCommand, TResult> _decoratee;
+	private readonly IOperationService<TOperation, TResult> _decoratee;
 
-	public TransactionCommandServiceDecorator(ICommandService<TCommand, TResult> decoratee)
+	public TransactionCommandServiceDecorator(IOperationService<TOperation, TResult> decoratee)
 	{
 		_decoratee = decoratee;
 	}
 
-	public async Task<TResult> Execute(TCommand command, CancellationToken cancellation)
+	public async Task<TResult> Execute(TOperation command, CancellationToken cancellation)
 	{
 		using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 

@@ -96,18 +96,14 @@ public class SimpleInjectorServiceConfigurator
 
 	private void RegisterApplication()
 	{
-		_container.Register(typeof(ICommandService<,>), typeof(ICommandService<,>).Assembly);
-		_container.Register(typeof(ICommandService<>), typeof(UnitCommandAdapter<>));
+		_container.Register(typeof(IOperationService<,>), typeof(IOperationService<,>).Assembly);
+		_container.RegisterDecorator(typeof(IOperationService<,>), typeof(TransactionCommandServiceDecorator<,>));
+		_container.RegisterDecorator(typeof(IOperationService<,>), typeof(ValidationCommandServiceDecorator<,>));
+		_container.RegisterDecorator(typeof(IOperationService<,>), typeof(SecurityCommandServiceDecorator<,>));
+		_container.RegisterDecorator(typeof(IOperationService<,>), typeof(ExceptionLogCommandServiceDecorator<,>));
 
 		_container.Collection.Register(typeof(IValidator<>), typeof(ICommandService<,>).Assembly);
 		_container.Register(typeof(IDomainValidator<>), typeof(FluentCommandValidator<>));
-
-		_container.RegisterDecorator(typeof(ICommandService<,>), typeof(TransactionCommandServiceDecorator<,>));
-		_container.RegisterDecorator(typeof(ICommandService<,>), typeof(ValidationCommandServiceDecorator<,>));
-		_container.RegisterDecorator(typeof(ICommandService<,>), typeof(SecurityCommandServiceDecorator<,>));
-		_container.RegisterDecorator(typeof(ICommandService<,>), typeof(ExceptionLogCommandServiceDecorator<,>));
-
-		_container.Register(typeof(IQueryService<,>), typeof(IQueryService<,>).Assembly);
 	}
 
 	private void RegisterApi()

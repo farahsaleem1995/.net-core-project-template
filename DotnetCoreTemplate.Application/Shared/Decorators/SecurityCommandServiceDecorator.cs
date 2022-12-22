@@ -6,23 +6,23 @@ using System.Reflection;
 
 namespace DotnetCoreTemplate.Application.Shared.Decorators;
 
-public class SecurityCommandServiceDecorator<TCommand, TResult> : ICommandService<TCommand, TResult>
-	where TCommand : ICommand<TResult>
+public class SecurityCommandServiceDecorator<TOperation, TResult> : IOperationService<TOperation, TResult>
+	where TOperation : IOperation<TResult>
 {
-	private readonly ICommandService<TCommand, TResult> _decoratee;
+	private readonly IOperationService<TOperation, TResult> _decoratee;
 	private readonly IUserContext _userContext;
 
 	public SecurityCommandServiceDecorator(
-		ICommandService<TCommand, TResult> decoratee,
+		IOperationService<TOperation, TResult> decoratee,
 		IUserContext userContext)
 	{
 		_decoratee = decoratee;
 		_userContext = userContext;
 	}
 
-	public async Task<TResult> Execute(TCommand command, CancellationToken cancellation)
+	public async Task<TResult> Execute(TOperation command, CancellationToken cancellation)
 	{
-		var securityAttribute = typeof(TCommand).GetCustomAttribute<SecurityAttribute>();
+		var securityAttribute = typeof(TOperation).GetCustomAttribute<SecurityAttribute>();
 
 		if (securityAttribute != null)
 		{

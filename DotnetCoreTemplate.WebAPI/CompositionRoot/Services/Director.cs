@@ -24,32 +24,18 @@ public class Director : IDirector
 		_executionDelegates = executionDelegates;
 	}
 
-	public async Task<TResult> Execute<TResult>(ICommand<TResult> command, CancellationToken cancellation)
+	public async Task<TResult> Execute<TResult>(IOperation<TResult> command, CancellationToken cancellation)
 	{
 		var commandType = command.GetType();
-		var commandServiceType = GetCommandServiceType<TResult>(commandType);
+		var commandServiceType = GetOperationServiceType<TResult>(commandType);
 
 		return await GetExecutionResult<TResult>(command, commandServiceType.Type, cancellation);
 	}
 
-	private OperationServiceType GetCommandServiceType<TResult>(Type commandType)
+	private OperationServiceType GetOperationServiceType<TResult>(Type commandType)
 	{
 		return _serviceTypes.Get(commandType,
-			type => OperationServiceHelper.MakeCommandServiceType(type, typeof(TResult)));
-	}
-
-	public async Task<TResult> Execute<TResult>(IQuery<TResult> query, CancellationToken cancellation)
-	{
-		var queryType = query.GetType();
-		var queryServiceType = GetQueryServiceType<TResult>(queryType);
-
-		return await GetExecutionResult<TResult>(query, queryServiceType.Type, cancellation);
-	}
-
-	private OperationServiceType GetQueryServiceType<TResult>(Type queryType)
-	{
-		return _serviceTypes.Get(queryType,
-			type => OperationServiceHelper.MakeQueryServiceType(type, typeof(TResult)));
+			type => OperationServiceHelper.MakeOperationServiceType(type, typeof(TResult)));
 	}
 
 	private async Task<TResult> GetExecutionResult<TResult>(

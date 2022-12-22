@@ -9,14 +9,9 @@ public static class OperationServiceHelper
 	private static readonly MethodInfo _callOperationServiceExecuteOpenGenericMethod =
 		typeof(OperationServiceHelper).GetTypeInfo().GetDeclaredMethod(nameof(CallOperationServiceExecute))!;
 
-	public static OperationServiceType MakeCommandServiceType(Type commandType, Type resultType)
+	public static OperationServiceType MakeOperationServiceType(Type operationType, Type resultType)
 	{
-		return new(typeof(ICommandService<,>).MakeGenericType(commandType, resultType));
-	}
-
-	public static OperationServiceType MakeQueryServiceType(Type queryType, Type resultType)
-	{
-		return new(typeof(IQueryService<,>).MakeGenericType(queryType, resultType));
+		return new(typeof(IOperationService<,>).MakeGenericType(operationType, resultType));
 	}
 
 	public static OperationExecutor MakeFastOperationExecutor(Type serviceType)

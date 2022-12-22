@@ -2,7 +2,5 @@
 
 public interface IDirector
 {
-	Task<TResult> Execute<TResult>(ICommand<TResult> command, CancellationToken cancellation);
-
-	Task<TResult> Execute<TResult>(IQuery<TResult> query, CancellationToken cancellation);
+	Task<TResult> Execute<TResult>(IOperation<TResult> command, CancellationToken cancellation);
 }

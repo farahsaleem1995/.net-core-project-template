@@ -2,7 +2,7 @@
 
 namespace DotnetCoreTemplate.Application.Shared.Interfaces;
 
-public interface ICommand<TResult>
+public interface ICommand<TResult> : IOperation<TResult>
 {
 }
 

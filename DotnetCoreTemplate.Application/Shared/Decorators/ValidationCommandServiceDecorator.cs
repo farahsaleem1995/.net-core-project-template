@@ -3,21 +3,21 @@ using ValidationException = DotnetCoreTemplate.Application.Shared.Exceptions.Val
 
 namespace DotnetCoreTemplate.Application.Shared.Decorators;
 
-public class ValidationCommandServiceDecorator<TCommand, TResult> : ICommandService<TCommand, TResult>
-	where TCommand : ICommand<TResult>
+public class ValidationCommandServiceDecorator<TOperation, TResult> : IOperationService<TOperation, TResult>
+	where TOperation : ICommand<TResult>
 {
-	private readonly ICommandService<TCommand, TResult> _decoratee;
-	private readonly IDomainValidator<TCommand> _validator;
+	private readonly IOperationService<TOperation, TResult> _decoratee;
+	private readonly IDomainValidator<TOperation> _validator;
 
 	public ValidationCommandServiceDecorator(
-		ICommandService<TCommand, TResult> decoratee,
-		IDomainValidator<TCommand> validator)
+		IOperationService<TOperation, TResult> decoratee,
+		IDomainValidator<TOperation> validator)
 	{
 		_decoratee = decoratee;
 		_validator = validator;
 	}
 
-	public async Task<TResult> Execute(TCommand command, CancellationToken cancellation)
+	public async Task<TResult> Execute(TOperation command, CancellationToken cancellation)
 	{
 		var validationResult = await _validator.Validate(command, cancellation);
 
