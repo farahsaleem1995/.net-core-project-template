@@ -1,6 +1,4 @@
-﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
-
-namespace DotnetCoreTemplate.WebAPI.Interfaces;
+﻿namespace DotnetCoreTemplate.Application.Shared.Interfaces;
 
 public interface IDirector
 {

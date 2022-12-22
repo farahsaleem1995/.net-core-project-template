@@ -8,7 +8,6 @@ using DotnetCoreTemplate.WebAPI.CompositionRoot.Adapters;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Services;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Utils;
 using DotnetCoreTemplate.WebAPI.Extensions;
-using DotnetCoreTemplate.WebAPI.Interfaces;
 using DotnetCoreTemplate.WebAPI.Services;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;

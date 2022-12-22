@@ -1,6 +1,5 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Helpers;
-using DotnetCoreTemplate.WebAPI.Interfaces;
 using SimpleInjector;
 
 namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Services;

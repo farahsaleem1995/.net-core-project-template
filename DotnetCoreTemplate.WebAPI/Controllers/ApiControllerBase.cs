@@ -1,4 +1,4 @@
-﻿using DotnetCoreTemplate.WebAPI.Interfaces;
+﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DotnetCoreTemplate.WebAPI.Controllers;

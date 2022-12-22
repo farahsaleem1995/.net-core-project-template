@@ -1,11 +1,11 @@
-﻿using DotnetCoreTemplate.Application.TodoItems.Commands.CreateTodoItem;
+﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
+using DotnetCoreTemplate.Application.TodoItems.Commands.CreateTodoItem;
 using DotnetCoreTemplate.Application.TodoItems.Commands.SetTodoItemAsDoing;
 using DotnetCoreTemplate.Application.TodoItems.Commands.SetTodoItemAsDone;
 using DotnetCoreTemplate.Application.TodoItems.Commands.SetTodoItemAsToDo;
 using DotnetCoreTemplate.Application.TodoItems.Commands.UpdateTodoItem;
 using DotnetCoreTemplate.Application.TodoItems.Queries.GetTodoItemById;
 using DotnetCoreTemplate.Application.TodoItems.Queries.GetTodoItems;
-using DotnetCoreTemplate.WebAPI.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DotnetCoreTemplate.WebAPI.Controllers;

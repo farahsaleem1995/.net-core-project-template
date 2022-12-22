@@ -1,4 +1,4 @@
-﻿using DotnetCoreTemplate.WebAPI.Interfaces;
+﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
 using System.Collections.Concurrent;
 
 namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Utils;
