@@ -131,5 +131,7 @@ public class SimpleInjectorServiceConfigurator
 			Lifestyle.Scoped.CreateRegistration(typeof(EFPaginationSpecificationEvaluator), _container),
 		});
 		_container.Register<ISpecificationEvaluator, EFSpecificationEvaluator>(Lifestyle.Scoped);
+
+		_container.Register<ISpecificationProjector, EFFSpecificationProjector>(Lifestyle.Scoped);
 	}
 }

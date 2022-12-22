@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 
 namespace DotnetCoreTemplate.Application.Shared.Specification;
 
-public class SpecificationBase<TEntity> :
+public abstract class SpecificationBase<TEntity> :
 	IFilterSpecification<TEntity>,
 	IOrderSpecification<TEntity>,
 	IIncludeSpecification<TEntity>,

@@ -17,19 +17,7 @@ public class GetTodoItemsService : IQueryService<GetTodoItemsQuery, PaginatedLis
 
 	public async Task<PaginatedList<TodoItemsDto>> Execute(GetTodoItemsQuery query, CancellationToken cancellation)
 	{
-		var todoItems = await _todoItemsRepository.PaginateAsync(
-			new TodoItemsSpecification(query.PageNumber, query.PageSize), cancellation);
-
-		return Project(todoItems);
-	}
-
-	private static PaginatedList<TodoItemsDto> Project(PaginatedList<TodoItem> todoItems)
-	{
-		var dtoItems = todoItems.Items
-			.Select(t => new TodoItemsDto(t.Id, t.Title, t.Description, t.Status))
-			.ToList();
-
-		return new PaginatedList<TodoItemsDto>(
-			dtoItems, todoItems.TotalItems, todoItems.PageNumber, todoItems.PageSize);
+		return await _todoItemsRepository.PaginateAsync(
+			new TodoItemsProjectSpecification(query.PageNumber, query.PageSize), cancellation);
 	}
 }
