@@ -3,4 +3,6 @@
 public interface IDomainLogger<T>
 {
 	void LogException(Exception exception);
+
+	void LogMessage(string message);
 }

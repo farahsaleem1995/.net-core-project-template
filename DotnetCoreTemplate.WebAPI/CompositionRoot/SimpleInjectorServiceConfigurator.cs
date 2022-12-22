@@ -102,6 +102,10 @@ public class SimpleInjectorServiceConfigurator
 		_container.RegisterDecorator(typeof(IOperationService<,>), typeof(SecurityCommandServiceDecorator<,>));
 		_container.RegisterDecorator(typeof(IOperationService<,>), typeof(ExceptionLogCommandServiceDecorator<,>));
 
+		_container.Collection.Register(typeof(IEventHandler<>), typeof(IEventHandler<>).Assembly);
+		_container.Register(typeof(IEventHandler<>), typeof(CompositeEventHandler<>));
+		_container.Register<IEventDispatcher, EventDispatcher>();
+
 		_container.Collection.Register(typeof(IValidator<>), typeof(ICommandService<,>).Assembly);
 		_container.Register(typeof(IDomainValidator<>), typeof(FluentCommandValidator<>));
 	}
