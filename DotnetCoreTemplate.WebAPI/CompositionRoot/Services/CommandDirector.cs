@@ -5,19 +5,20 @@ using SimpleInjector;
 
 namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Services;
 
-public record ServiceType(Type Type);
-public record ExecutionDelegate(Delegate Delegate);
+public record CommandServiceType(Type Type);
+
+public delegate object CommandExecutor(object commandService, object command, CancellationToken cancellation);
 
 public class CommandDirector : ICommandDirector
 {
 	private readonly Container _container;
-	private readonly ILocalCache<Type, ServiceType> _serviceTypes;
-	private readonly ILocalCache<Type, ExecutionDelegate> _executionDelegates;
+	private readonly ILocalCache<Type, CommandServiceType> _serviceTypes;
+	private readonly ILocalCache<Type, CommandExecutor> _executionDelegates;
 
 	public CommandDirector(
 		Container container,
-		ILocalCache<Type, ServiceType> serviceTypes,
-		ILocalCache<Type, ExecutionDelegate> executionDelegates)
+		ILocalCache<Type, CommandServiceType> serviceTypes,
+		ILocalCache<Type, CommandExecutor> executionDelegates)
 	{
 		_container = container;
 		_serviceTypes = serviceTypes;
@@ -28,28 +29,25 @@ public class CommandDirector : ICommandDirector
 	{
 		var commandType = command.GetType();
 
-		var serviceType = GetServiceType<TResult>(commandType);
+		var commandServiceType = GetCommandServiceType<TResult>(commandType);
 
-		var serviceObject = _container.GetInstance(serviceType);
+		var commandService = _container.GetInstance(commandServiceType.Type);
 
-		var executeDelegate = GetExecuteDelegate<TResult>(serviceType);
+		var executor = GetCommandExecutor(commandServiceType.Type);
 
-		return await executeDelegate(serviceObject, command, cancellation);
+		var result = executor(commandService, command, cancellation);
+
+		return await (Task<TResult>)result;
 	}
 
-	private Type GetServiceType<TResult>(Type commandType)
+	private CommandServiceType GetCommandServiceType<TResult>(Type commandType)
 	{
-		var serviceType = _serviceTypes.Get(commandType, type =>
-			new(CommandServiceHelper.MakeGenericType<TResult>(commandType)));
-
-		return serviceType.Type;
+		return _serviceTypes.Get(commandType,
+			type => CommandServiceHelper.MakeCommandServiceType(type, typeof(TResult)));
 	}
 
-	private Func<object, object, CancellationToken, Task<TResult>> GetExecuteDelegate<TResult>(Type serviceType)
+	private CommandExecutor GetCommandExecutor(Type serviceType)
 	{
-		var executionDelegate = _executionDelegates.Get(serviceType, type =>
-			new(CommandServiceHelper.MakeFastExecutionDelegate<TResult>(type)));
-
-		return (Func<object, object, CancellationToken, Task<TResult>>)executionDelegate.Delegate;
+		return _executionDelegates.Get(serviceType, CommandServiceHelper.MakeFastCommandExecutor);
 	}
 }

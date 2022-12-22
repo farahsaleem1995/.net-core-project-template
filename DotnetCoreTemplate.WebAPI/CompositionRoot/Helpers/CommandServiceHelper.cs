@@ -9,31 +9,36 @@ public static class CommandServiceHelper
 	private static readonly MethodInfo _callCommandServiceExecuteOpenGenericMethod =
 		typeof(CommandServiceHelper).GetTypeInfo().GetDeclaredMethod(nameof(CallCommandServiceExecute))!;
 
-	public static Type MakeGenericType<TResult>(Type commandType)
+	public static CommandServiceType MakeCommandServiceType(Type commandType, Type resultType)
 	{
-		return typeof(ICommandService<,>).MakeGenericType(commandType, typeof(TResult));
+		return new(typeof(ICommandService<,>).MakeGenericType(commandType, resultType));
 	}
 
-	public static Delegate MakeFastExecutionDelegate<TResult>(Type serviceType)
+	public static CommandExecutor MakeFastCommandExecutor(Type serviceType)
 	{
-		var executeMethod = serviceType.GetMethod("Execute")!;
+		var methodInfo = serviceType.GetMethod("Execute")!;
 
-		var executeReturnType = executeMethod.ReturnType;
-		var executeParameters = executeMethod.GetParameters().ToArray();
+		var returnType = methodInfo.ReturnType;
+		var parameters = methodInfo.GetParameters().ToArray();
 
-		var commandParameterType = executeParameters[0].ParameterType;
-		var canellationParameterType = executeParameters[1].ParameterType;
+		var commandType = parameters[0].ParameterType;
+		var canellationType = parameters[1].ParameterType;
 
-		var executeDelegateType = typeof(Func<,,,>).MakeGenericType(
-			serviceType, commandParameterType, canellationParameterType, executeReturnType);
+		var delegateType = typeof(Func<,,,>).MakeGenericType(serviceType, commandType, canellationType, returnType);
+		var executeDelegate = methodInfo!.CreateDelegate(delegateType);
 
-		var executeDelegate = executeMethod!.CreateDelegate(executeDelegateType);
+		return CreateExecuteWrapperDelegate(executeDelegate, serviceType, commandType, returnType);
+	}
 
+	private static CommandExecutor CreateExecuteWrapperDelegate(
+		Delegate executeDelegate, Type serviceType, Type commandType, Type returnType)
+	{
 		var wrapperDelegateMethod = _callCommandServiceExecuteOpenGenericMethod.MakeGenericMethod(
-			serviceType, commandParameterType, executeReturnType);
+			serviceType, commandType, returnType);
 
-		return wrapperDelegateMethod.CreateDelegate(
-			typeof(Func<object, object, CancellationToken, Task<TResult>>), executeDelegate);
+		var wrapperDelegate = wrapperDelegateMethod.CreateDelegate(typeof(CommandExecutor), executeDelegate);
+
+		return (CommandExecutor)wrapperDelegate;
 	}
 
 	private static TResult CallCommandServiceExecute<TService, TCommand, TResult>(
