@@ -13,6 +13,7 @@ using DotnetCoreTemplate.WebAPI.Services;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using SimpleInjector;
+using System.Text.Json.Serialization;
 
 namespace DotnetCoreTemplate.WebAPI.CompositionRoot;
 
@@ -41,12 +42,17 @@ public class SimpleInjectorServiceConfigurator
 
 	private void InitializeServices()
 	{
-		_services.AddControllers(options =>
-		{
-			options.UseGeneralRoutePrefix("api/");
-			options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
-			options.ModelValidatorProviders.Clear();
-		});
+		_services
+			.AddControllers(options =>
+			{
+				options.UseGeneralRoutePrefix("api/");
+				options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+				options.ModelValidatorProviders.Clear();
+			})
+			.AddJsonOptions(options =>
+			{
+				options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+			});
 
 		_services.AddRazorPages();
 		_services.AddEndpointsApiExplorer();
@@ -91,8 +97,10 @@ public class SimpleInjectorServiceConfigurator
 
 	private void RegisterApplication()
 	{
-		_container.Register(typeof(ICommandService<,>), typeof(ICommandService<>).Assembly);
+		_container.Register(typeof(ICommandService<,>), typeof(ICommandService<,>).Assembly);
 		_container.Register(typeof(ICommandService<>), typeof(UnitCommandAdapter<>));
+
+		_container.Register(typeof(IQueryService<,>), typeof(IQueryService<,>).Assembly);
 
 		_container.Collection.Register(typeof(IValidator<>), typeof(ICommandService<,>).Assembly);
 		_container.Register(typeof(IDomainValidator<>), typeof(FluentCommandValidator<>));
@@ -106,7 +114,7 @@ public class SimpleInjectorServiceConfigurator
 	{
 		_container.Register<IUserContext, AspNetUserContextAdapter>(Lifestyle.Scoped);
 
-		_container.Register<ICommandDirector, CommandDirector>(Lifestyle.Singleton);
+		_container.Register<IDirector, Director>(Lifestyle.Singleton);
 
 		_container.Register(typeof(ILocalCache<,>), typeof(ConcurrentLocalCache<,>), Lifestyle.Singleton);
 	}

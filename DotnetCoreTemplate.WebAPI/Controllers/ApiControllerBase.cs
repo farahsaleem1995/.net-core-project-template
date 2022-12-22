@@ -7,10 +7,10 @@ namespace DotnetCoreTemplate.WebAPI.Controllers;
 [Route("[controller]")]
 public class ApiControllerBase : Controller
 {
-	public ApiControllerBase(ICommandDirector director)
+	public ApiControllerBase(IDirector director)
 	{
 		Director = director;
 	}
 
-	public ICommandDirector Director { get; }
+	public IDirector Director { get; }
 }

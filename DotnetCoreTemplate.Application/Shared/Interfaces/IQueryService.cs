@@ -1,6 +1,7 @@
 ﻿namespace DotnetCoreTemplate.Application.Shared.Interfaces;
 
-public interface IQueryService<TCommand, TResult>
+public interface IQueryService<TQuery, TResult>
+	where TQuery : IQuery<TResult>
 {
-    Task<TResult> Execute(TCommand command, CancellationToken cancellation);
+	Task<TResult> Execute(TQuery query, CancellationToken cancellation);
 }
