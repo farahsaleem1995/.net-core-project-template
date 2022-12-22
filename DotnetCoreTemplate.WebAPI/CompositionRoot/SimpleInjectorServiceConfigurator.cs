@@ -99,14 +99,15 @@ public class SimpleInjectorServiceConfigurator
 		_container.Register(typeof(ICommandService<,>), typeof(ICommandService<,>).Assembly);
 		_container.Register(typeof(ICommandService<>), typeof(UnitCommandAdapter<>));
 
-		_container.Register(typeof(IQueryService<,>), typeof(IQueryService<,>).Assembly);
-
 		_container.Collection.Register(typeof(IValidator<>), typeof(ICommandService<,>).Assembly);
 		_container.Register(typeof(IDomainValidator<>), typeof(FluentCommandValidator<>));
 
 		_container.RegisterDecorator(typeof(ICommandService<,>), typeof(TransactionCommandServiceDecorator<,>));
 		_container.RegisterDecorator(typeof(ICommandService<,>), typeof(ValidationCommandServiceDecorator<,>));
 		_container.RegisterDecorator(typeof(ICommandService<,>), typeof(SecurityCommandServiceDecorator<,>));
+		_container.RegisterDecorator(typeof(ICommandService<,>), typeof(ExceptionLogCommandServiceDecorator<,>));
+
+		_container.Register(typeof(IQueryService<,>), typeof(IQueryService<,>).Assembly);
 	}
 
 	private void RegisterApi()
@@ -116,6 +117,8 @@ public class SimpleInjectorServiceConfigurator
 		_container.Register<IDirector, Director>(Lifestyle.Singleton);
 
 		_container.Register(typeof(ILocalCache<,>), typeof(ConcurrentLocalCache<,>), Lifestyle.Singleton);
+
+		_container.Register(typeof(IDomainLogger<>), typeof(AspNetLogger<>), Lifestyle.Singleton);
 	}
 
 	private void RegisterInfrastructure()

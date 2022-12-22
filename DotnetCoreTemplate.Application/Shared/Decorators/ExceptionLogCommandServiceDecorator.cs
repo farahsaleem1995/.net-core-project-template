@@ -7,11 +7,11 @@ public class ExceptionLogCommandServiceDecorator<TCommand, TResult> : ICommandSe
 	where TCommand : ICommand<TResult>
 {
 	private readonly ICommandService<TCommand, TResult> _decoratee;
-	private readonly IDomainLogger _logger;
+	private readonly IDomainLogger<TCommand> _logger;
 
 	public ExceptionLogCommandServiceDecorator(
 		ICommandService<TCommand, TResult> decoratee,
-		IDomainLogger logger)
+		IDomainLogger<TCommand> logger)
 	{
 		_decoratee = decoratee;
 		_logger = logger;
