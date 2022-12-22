@@ -1,10 +1,11 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
+using DotnetCoreTemplate.Application.Shared.Models;
 using DotnetCoreTemplate.Application.TodoItems.Specification;
 using DotnetCoreTemplate.Domain.Entities;
 
 namespace DotnetCoreTemplate.Application.TodoItems.Queries.GetTodoItems;
 
-public class GetTodoItemsService : IQueryService<GetTodoItemsQuery, IEnumerable<TodoItemsDto>>
+public class GetTodoItemsService : IQueryService<GetTodoItemsQuery, PaginatedList<TodoItemsDto>>
 {
 	private readonly IRepository<TodoItem> _todoItemsRepository;
 
@@ -14,11 +15,21 @@ public class GetTodoItemsService : IQueryService<GetTodoItemsQuery, IEnumerable<
 		_todoItemsRepository = todoItemsRepository;
 	}
 
-	public async Task<IEnumerable<TodoItemsDto>> Execute(GetTodoItemsQuery query, CancellationToken cancellation)
+	public async Task<PaginatedList<TodoItemsDto>> Execute(GetTodoItemsQuery query, CancellationToken cancellation)
 	{
-		var todoItems = await _todoItemsRepository.ListAsync(
+		var todoItems = await _todoItemsRepository.PaginateAsync(
 			new TodoItemsSpecification(query.PageNumber, query.PageSize), cancellation);
 
-		return todoItems.Select(t => new TodoItemsDto(t.Title, t.Description, t.Status));
+		return Project(todoItems);
+	}
+
+	private static PaginatedList<TodoItemsDto> Project(PaginatedList<TodoItem> todoItems)
+	{
+		var dtoItems = todoItems.Items
+			.Select(t => new TodoItemsDto(t.Id, t.Title, t.Description, t.Status))
+			.ToList();
+
+		return new PaginatedList<TodoItemsDto>(
+			dtoItems, todoItems.TotalItems, todoItems.PageNumber, todoItems.PageSize);
 	}
 }

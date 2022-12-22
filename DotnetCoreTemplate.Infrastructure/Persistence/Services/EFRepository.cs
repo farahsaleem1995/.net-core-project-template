@@ -1,4 +1,5 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
+using DotnetCoreTemplate.Application.Shared.Models;
 using DotnetCoreTemplate.Application.Shared.Specification;
 using DotnetCoreTemplate.Infrastructure.Persistence.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -7,52 +8,56 @@ namespace DotnetCoreTemplate.Infrastructure.Persistence.Services;
 
 public class EFRepository<TEntity> : IRepository<TEntity> where TEntity : class
 {
-    private readonly ApplicationDbContext _dbContext;
-    private readonly ISpecificationEvaluator _evaluator;
+	private readonly ApplicationDbContext _dbContext;
+	private readonly ISpecificationEvaluator _evaluator;
 
-    public EFRepository(ApplicationDbContext dbContext, ISpecificationEvaluator evaluator)
-    {
-        _dbContext = dbContext;
-        _evaluator = evaluator;
-    }
+	public EFRepository(ApplicationDbContext dbContext, ISpecificationEvaluator evaluator)
+	{
+		_dbContext = dbContext;
+		_evaluator = evaluator;
+	}
 
-    public async Task AddAsync(TEntity entity, CancellationToken cancellation = default)
-    {
-        if (entity == null)
-            throw new ArgumentNullException(nameof(entity));
+	public async Task AddAsync(TEntity entity, CancellationToken cancellation = default)
+	{
+		if (entity == null)
+			throw new ArgumentNullException(nameof(entity));
 
-        await _dbContext.AddAsync(entity, cancellation);
-    }
+		await _dbContext.AddAsync(entity, cancellation);
+	}
 
-    public Task RemoveAsync(TEntity entity, CancellationToken cancellation = default)
-    {
-        if (entity == null)
-            throw new ArgumentNullException(nameof(entity));
+	public Task RemoveAsync(TEntity entity, CancellationToken cancellation = default)
+	{
+		if (entity == null)
+			throw new ArgumentNullException(nameof(entity));
 
-        _dbContext.Remove(entity);
+		_dbContext.Remove(entity);
 
-        return Task.CompletedTask;
-    }
+		return Task.CompletedTask;
+	}
 
-    public async Task<TEntity?> FirstOrDefaultAsync(SpecificationBase<TEntity> specification,
-        CancellationToken cancellation = default)
-    {
-        if (specification == null)
-            throw new ArgumentNullException(nameof(specification));
+	public async Task<TEntity?> FirstOrDefaultAsync(SpecificationBase<TEntity> specification,
+		CancellationToken cancellation = default)
+	{
+		if (specification == null)
+			throw new ArgumentNullException(nameof(specification));
 
-        var query = _evaluator.Evaluate(_dbContext.Set<TEntity>(), specification);
+		var query = _evaluator.Evaluate(_dbContext.Set<TEntity>(), specification);
 
-        return await query.FirstOrDefaultAsync(cancellation);
-    }
+		return await query.FirstOrDefaultAsync(cancellation);
+	}
 
-    public async Task<IEnumerable<TEntity>> ListAsync(SpecificationBase<TEntity> specification,
-        CancellationToken cancellation = default)
-    {
-        if (specification == null)
-            throw new ArgumentNullException(nameof(specification));
+	public async Task<PaginatedList<TEntity>> PaginateAsync(SpecificationBase<TEntity> specification,
+		CancellationToken cancellation = default)
+	{
+		if (specification == null)
+			throw new ArgumentNullException(nameof(specification));
 
-        var query = _evaluator.Evaluate(_dbContext.Set<TEntity>(), specification);
+		var query = _evaluator.Evaluate(_dbContext.Set<TEntity>(), specification);
 
-        return await query.ToListAsync(cancellation);
-    }
+		var items = await query.ToListAsync(cancellation);
+		var totalItems = await query.CountAsync(cancellation);
+
+		return new PaginatedList<TEntity>(
+			items, totalItems, specification.PageNumber, specification.PageSize);
+	}
 }

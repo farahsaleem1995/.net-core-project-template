@@ -1,8 +1,9 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
+using DotnetCoreTemplate.Application.Shared.Models;
 
 namespace DotnetCoreTemplate.Application.TodoItems.Queries.GetTodoItems;
 
-public class GetTodoItemsQuery : IQuery<IEnumerable<TodoItemsDto>>
+public class GetTodoItemsQuery : IQuery<PaginatedList<TodoItemsDto>>
 {
 	public int PageNumber { get; set; } = 1;
 

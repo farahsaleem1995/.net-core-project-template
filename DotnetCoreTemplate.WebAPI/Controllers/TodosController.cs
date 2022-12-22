@@ -3,6 +3,7 @@ using DotnetCoreTemplate.Application.TodoItems.Commands.SetTodoItemAsDoing;
 using DotnetCoreTemplate.Application.TodoItems.Commands.SetTodoItemAsDone;
 using DotnetCoreTemplate.Application.TodoItems.Commands.SetTodoItemAsToDo;
 using DotnetCoreTemplate.Application.TodoItems.Commands.UpdateTodoItem;
+using DotnetCoreTemplate.Application.TodoItems.Queries.GetTodoItemById;
 using DotnetCoreTemplate.Application.TodoItems.Queries.GetTodoItems;
 using DotnetCoreTemplate.WebAPI.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +21,14 @@ public class TodosController : ApiControllerBase
 		CancellationToken cancellation)
 	{
 		var todoItems = await Director.Execute(query, cancellation);
+
+		return Ok(todoItems);
+	}
+
+	[HttpGet("{id}")]
+	public async Task<IActionResult> Create([FromRoute] int id, CancellationToken cancellation)
+	{
+		var todoItems = await Director.Execute(new GetTodoItemByIdQuery(id), cancellation);
 
 		return Ok(todoItems);
 	}
