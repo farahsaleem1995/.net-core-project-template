@@ -9,6 +9,7 @@ public class TodoItemByIdProjectSpecification : ProjectSpecificationBase<TodoIte
 	{
 		WithFilter(t => t.Id == todoItemId);
 
-		Project(t => new TodoItemDto(t.Id, t.Title, t.Description, t.Status));
+		Project(t => new TodoItemDto(
+			t.Id, t.Title, t.Description, t.Status, t.CreatedDate, t.LastUpdatedDate));
 	}
 }

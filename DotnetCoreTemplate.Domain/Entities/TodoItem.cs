@@ -3,7 +3,7 @@ using DotnetCoreTemplate.Domain.Shared;
 
 namespace DotnetCoreTemplate.Domain.Entities;
 
-public class TodoItem : IHasDomainEvents
+public class TodoItem : Auditable, IHasDomainEvents
 {
 	private TodoItem(string title, string description)
 	{

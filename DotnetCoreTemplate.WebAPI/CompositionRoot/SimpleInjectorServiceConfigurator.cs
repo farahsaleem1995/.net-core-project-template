@@ -2,8 +2,10 @@
 using DotnetCoreTemplate.Application.Shared.Interfaces;
 using DotnetCoreTemplate.Application.Shared.Services;
 using DotnetCoreTemplate.Infrastructure.Persistence;
+using DotnetCoreTemplate.Infrastructure.Persistence.Decorator;
 using DotnetCoreTemplate.Infrastructure.Persistence.Interfaces;
 using DotnetCoreTemplate.Infrastructure.Persistence.Services;
+using DotnetCoreTemplate.Infrastructure.Services;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Adapters;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Services;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Utils;
@@ -124,8 +126,11 @@ public class SimpleInjectorServiceConfigurator
 
 	private void RegisterInfrastructure()
 	{
-		_container.Register(typeof(IRepository<>), typeof(EFRepository<>), Lifestyle.Scoped);
 		_container.Register<IUnitOfWork, EFUnitOfWork>(Lifestyle.Scoped);
+		_container.RegisterDecorator<IUnitOfWork, EventDispatchUnitOfWorkDecorator>(Lifestyle.Scoped);
+		_container.RegisterDecorator<IUnitOfWork, AuditUnitOfWorkDecorator>(Lifestyle.Scoped);
+
+		_container.Register(typeof(IRepository<>), typeof(EFRepository<>), Lifestyle.Scoped);
 
 		_container.Collection.Register<ISpecificationEvaluator>(new[]
 		{
@@ -137,5 +142,7 @@ public class SimpleInjectorServiceConfigurator
 		_container.Register<ISpecificationEvaluator, EFSpecificationEvaluator>(Lifestyle.Scoped);
 
 		_container.Register<ISpecificationProjector, EFFSpecificationProjector>(Lifestyle.Scoped);
+
+		_container.Register<ITimeProvider, UtcTimeProvider>(Lifestyle.Scoped);
 	}
 }
