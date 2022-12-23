@@ -6,23 +6,23 @@ using System.Reflection;
 
 namespace DotnetCoreTemplate.Application.Shared.Decorators;
 
-public class SecurityCommandServiceDecorator<TOperation, TResult> : IOperationService<TOperation, TResult>
-	where TOperation : IOperation<TResult>
+public class SecurityRequestHandlerDecorator<TRequest, TResult> : IRequestHandler<TRequest, TResult>
+	where TRequest : IRequest<TResult>
 {
-	private readonly IOperationService<TOperation, TResult> _decoratee;
+	private readonly IRequestHandler<TRequest, TResult> _decoratee;
 	private readonly IUserContext _userContext;
 
-	public SecurityCommandServiceDecorator(
-		IOperationService<TOperation, TResult> decoratee,
+	public SecurityRequestHandlerDecorator(
+		IRequestHandler<TRequest, TResult> decoratee,
 		IUserContext userContext)
 	{
 		_decoratee = decoratee;
 		_userContext = userContext;
 	}
 
-	public async Task<TResult> Execute(TOperation command, CancellationToken cancellation)
+	public async Task<TResult> Handle(TRequest request, CancellationToken cancellation)
 	{
-		var securityAttribute = typeof(TOperation).GetCustomAttribute<SecurityAttribute>();
+		var securityAttribute = typeof(TRequest).GetCustomAttribute<SecurityAttribute>();
 
 		if (securityAttribute != null)
 		{
@@ -30,7 +30,7 @@ public class SecurityCommandServiceDecorator<TOperation, TResult> : IOperationSe
 			CheckRole(securityAttribute.Role);
 		}
 
-		return await _decoratee.Execute(command, cancellation);
+		return await _decoratee.Handle(request, cancellation);
 	}
 
 	private void CheckAuthorization()

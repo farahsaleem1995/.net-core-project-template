@@ -4,21 +4,21 @@ using DotnetCoreTemplate.Domain.Entities;
 
 namespace DotnetCoreTemplate.Application.TodoItems.Queries.GetTodoItemById;
 
-public class GetTodoItemByIdService : IQueryService<GetTodoItemByIdQuery, TodoItemDto>
+public class GetTodoItemByIdHandler : IRequestHandler<GetTodoItemByIdQuery, TodoItemDto>
 {
 	private readonly IRepository<TodoItem> _todoItemsRepository;
 
-	public GetTodoItemByIdService(
+	public GetTodoItemByIdHandler(
 		IRepository<TodoItem> todoItemsRepository)
 	{
 		_todoItemsRepository = todoItemsRepository;
 	}
 
-	public async Task<TodoItemDto> Execute(GetTodoItemByIdQuery query, CancellationToken cancellation)
+	public async Task<TodoItemDto> Handle(GetTodoItemByIdQuery request, CancellationToken cancellation)
 	{
 		var todoItem = await _todoItemsRepository.FirstOrDefaultAsync(
-			new TodoItemByIdProjectSpecification(query.Id), cancellation);
+			new TodoItemByIdProjectSpecification(request.Id), cancellation);
 
-		return todoItem ?? throw new NotFoundException(typeof(TodoItem), query.Id);
+		return todoItem ?? throw new NotFoundException(typeof(TodoItem), request.Id);
 	}
 }

@@ -1,6 +1,8 @@
-﻿namespace DotnetCoreTemplate.Application.Shared.Interfaces;
+﻿using DotnetCoreTemplate.Domain.Shared;
 
-public interface IEventHandler<TEvent> where TEvent : IDomainEvent
+namespace DotnetCoreTemplate.Application.Shared.Interfaces;
+
+public interface IEventHandler<TEvent> where TEvent : DomainEvent
 {
-	Task Handle(TEvent domainEvent);
+	Task Handle(TEvent domainEvent, CancellationToken cancellation);
 }

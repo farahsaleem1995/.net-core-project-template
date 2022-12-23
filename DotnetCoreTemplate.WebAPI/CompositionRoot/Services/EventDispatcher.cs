@@ -1,4 +1,5 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
+using DotnetCoreTemplate.Domain.Shared;
 using SimpleInjector;
 
 namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Services;
@@ -14,10 +15,11 @@ public class EventDispatcher : IEventDispatcher
 		_container = container;
 	}
 
-	public async Task Dispatch<TEvent>(TEvent domainEvent) where TEvent : IDomainEvent
+	public async Task Dispatch<TEvent>(TEvent domainEvent, CancellationToken cancellation)
+		where TEvent : DomainEvent
 	{
 		var handler = _container.GetInstance<IEventHandler<TEvent>>();
 
-		await handler.Handle(domainEvent);
+		await handler.Handle(domainEvent, cancellation);
 	}
 }

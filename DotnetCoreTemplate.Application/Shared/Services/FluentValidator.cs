@@ -1,14 +1,13 @@
-﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
-using DotnetCoreTemplate.Application.Shared.Models;
+﻿using DotnetCoreTemplate.Application.Shared.Models;
 using FluentValidation;
 
 namespace DotnetCoreTemplate.Application.Shared.Services;
 
-public class FluentCommandValidator<T> : IDomainValidator<T>
+public class FluentValidator<T> : Interfaces.IValidator<T>
 {
-	private readonly IEnumerable<IValidator<T>> _validators;
+	private readonly IEnumerable<FluentValidation.IValidator<T>> _validators;
 
-	public FluentCommandValidator(IEnumerable<IValidator<T>> validators)
+	public FluentValidator(IEnumerable<FluentValidation.IValidator<T>> validators)
 	{
 		_validators = validators;
 	}

@@ -6,12 +6,12 @@ using DotnetCoreTemplate.Domain.Entities;
 
 namespace DotnetCoreTemplate.Application.TodoItems.Commands.UpdateTodoItem;
 
-public class UpdateTodoItemService : ICommandService<UpdateTodoItemCommand>
+public class UpdateTodoItemHandler : IRequestHandler<UpdateTodoItemCommand>
 {
 	private readonly IUnitOfWork _unitOfWork;
 	private readonly IRepository<TodoItem> _todoItemsRepository;
 
-	public UpdateTodoItemService(
+	public UpdateTodoItemHandler(
 		IUnitOfWork unitOfWork,
 		IRepository<TodoItem> todoItemsRepository)
 	{
@@ -19,11 +19,11 @@ public class UpdateTodoItemService : ICommandService<UpdateTodoItemCommand>
 		_todoItemsRepository = todoItemsRepository;
 	}
 
-	public async Task<Unit> Execute(UpdateTodoItemCommand command, CancellationToken cancellation)
+	public async Task<Unit> Handle(UpdateTodoItemCommand request, CancellationToken cancellation)
 	{
-		var todoItem = await GetTodoItem(command.Id, cancellation);
+		var todoItem = await GetTodoItem(request.Id, cancellation);
 
-		todoItem.Update(command.Title, command.Description);
+		todoItem.Update(request.Title, request.Description);
 
 		await _unitOfWork.SaveAsync(cancellation);
 

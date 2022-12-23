@@ -96,18 +96,19 @@ public class SimpleInjectorServiceConfigurator
 
 	private void RegisterApplication()
 	{
-		_container.Register(typeof(IOperationService<,>), typeof(IOperationService<,>).Assembly);
-		_container.RegisterDecorator(typeof(IOperationService<,>), typeof(TransactionCommandServiceDecorator<,>));
-		_container.RegisterDecorator(typeof(IOperationService<,>), typeof(ValidationCommandServiceDecorator<,>));
-		_container.RegisterDecorator(typeof(IOperationService<,>), typeof(SecurityCommandServiceDecorator<,>));
-		_container.RegisterDecorator(typeof(IOperationService<,>), typeof(ExceptionLogCommandServiceDecorator<,>));
+		_container.Register(typeof(IRequestHandler<,>), typeof(IRequestHandler<,>).Assembly);
+		_container.Register(typeof(IRequestHandler<>), typeof(UnitRequestAdapter<>));
+		_container.RegisterDecorator(typeof(IRequestHandler<,>), typeof(TransactionRequestHandlerDecorator<,>));
+		_container.RegisterDecorator(typeof(IRequestHandler<,>), typeof(ValidationRequestHandlerDecorator<,>));
+		_container.RegisterDecorator(typeof(IRequestHandler<,>), typeof(SecurityRequestHandlerDecorator<,>));
+		_container.RegisterDecorator(typeof(IRequestHandler<,>), typeof(ExceptionLogRequestHandlerDecorator<,>));
 
 		_container.Collection.Register(typeof(IEventHandler<>), typeof(IEventHandler<>).Assembly);
 		_container.Register(typeof(IEventHandler<>), typeof(CompositeEventHandler<>));
 		_container.Register<IEventDispatcher, EventDispatcher>();
 
-		_container.Collection.Register(typeof(IValidator<>), typeof(ICommandService<,>).Assembly);
-		_container.Register(typeof(IDomainValidator<>), typeof(FluentCommandValidator<>));
+		_container.Collection.Register(typeof(FluentValidation.IValidator<>), typeof(IRequestHandler<,>).Assembly);
+		_container.Register(typeof(Application.Shared.Interfaces.IValidator<>), typeof(FluentValidator<>));
 	}
 
 	private void RegisterApi()
@@ -118,7 +119,7 @@ public class SimpleInjectorServiceConfigurator
 
 		_container.Register(typeof(ILocalCache<,>), typeof(ConcurrentLocalCache<,>), Lifestyle.Singleton);
 
-		_container.Register(typeof(IDomainLogger<>), typeof(AspNetLogger<>), Lifestyle.Singleton);
+		_container.Register(typeof(Application.Shared.Interfaces.ILogger<>), typeof(AspNetLogger<>), Lifestyle.Singleton);
 	}
 
 	private void RegisterInfrastructure()

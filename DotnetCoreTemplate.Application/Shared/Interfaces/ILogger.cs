@@ -1,6 +1,6 @@
 ﻿namespace DotnetCoreTemplate.Application.Shared.Interfaces;
 
-public interface IDomainLogger<T>
+public interface ILogger<T>
 {
 	void LogException(Exception exception);
 

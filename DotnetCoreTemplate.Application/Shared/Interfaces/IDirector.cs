@@ -2,5 +2,5 @@
 
 public interface IDirector
 {
-	Task<TResult> Execute<TResult>(IOperation<TResult> command, CancellationToken cancellation);
+	Task<TResult> Send<TResult>(IRequest<TResult> request, CancellationToken cancellation);
 }

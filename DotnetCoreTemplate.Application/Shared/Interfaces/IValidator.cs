@@ -2,7 +2,7 @@
 
 namespace DotnetCoreTemplate.Application.Shared.Interfaces;
 
-public interface IDomainValidator<T>
+public interface IValidator<T>
 {
 	Task<ValidationResult> Validate(T instance, CancellationToken cancellation);
 }

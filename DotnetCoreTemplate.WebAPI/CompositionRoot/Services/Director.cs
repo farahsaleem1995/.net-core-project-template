@@ -4,54 +4,53 @@ using SimpleInjector;
 
 namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Services;
 
-public record OperationServiceType(Type Type);
+public record RequestHandlerType(Type Type);
 
-public delegate object OperationExecutor(object operationService, object operation, CancellationToken cancellation);
+public delegate object FastRequestHandler(object handler, object request, CancellationToken cancellation);
 
 public class Director : IDirector
 {
 	private readonly Container _container;
-	private readonly ILocalCache<Type, OperationServiceType> _serviceTypes;
-	private readonly ILocalCache<Type, OperationExecutor> _executionDelegates;
+	private readonly ILocalCache<Type, RequestHandlerType> _handlerTypes;
+	private readonly ILocalCache<Type, FastRequestHandler> _handlerDelegates;
 
 	public Director(
 		Container container,
-		ILocalCache<Type, OperationServiceType> serviceTypes,
-		ILocalCache<Type, OperationExecutor> executionDelegates)
+		ILocalCache<Type, RequestHandlerType> handlerTypes,
+		ILocalCache<Type, FastRequestHandler> handlerDelegates)
 	{
 		_container = container;
-		_serviceTypes = serviceTypes;
-		_executionDelegates = executionDelegates;
+		_handlerTypes = handlerTypes;
+		_handlerDelegates = handlerDelegates;
 	}
 
-	public async Task<TResult> Execute<TResult>(IOperation<TResult> command, CancellationToken cancellation)
+	public async Task<TResult> Send<TResult>(IRequest<TResult> request, CancellationToken cancellation)
 	{
-		var commandType = command.GetType();
-		var commandServiceType = GetOperationServiceType<TResult>(commandType);
+		var requestType = request.GetType();
+		var handlerType = GetHandlerType<TResult>(requestType);
 
-		return await GetExecutionResult<TResult>(command, commandServiceType.Type, cancellation);
+		return await CallHandler<TResult>(request, handlerType.Type, cancellation);
 	}
 
-	private OperationServiceType GetOperationServiceType<TResult>(Type commandType)
+	private RequestHandlerType GetHandlerType<TResult>(Type requestType)
 	{
-		return _serviceTypes.Get(commandType,
-			type => OperationServiceHelper.MakeOperationServiceType(type, typeof(TResult)));
+		return _handlerTypes.Get(requestType, RequestHelper.MaketHandlerType<TResult>);
 	}
 
-	private async Task<TResult> GetExecutionResult<TResult>(
-		object operation, Type operationType, CancellationToken cancellation)
+	private async Task<TResult> CallHandler<TResult>(
+		object request, Type requestType, CancellationToken cancellation)
 	{
-		var opertionService = _container.GetInstance(operationType);
+		var handlerInstance = _container.GetInstance(requestType);
 
-		var executor = GetOperationExecutor(operationType);
+		var fastHandler = MakeFastHandler<TResult>(requestType);
 
-		var result = executor(opertionService, operation, cancellation);
+		var result = fastHandler(handlerInstance, request, cancellation);
 
 		return await (Task<TResult>)result;
 	}
 
-	private OperationExecutor GetOperationExecutor(Type serviceType)
+	private FastRequestHandler MakeFastHandler<TResult>(Type handlerType)
 	{
-		return _executionDelegates.Get(serviceType, OperationServiceHelper.MakeFastOperationExecutor);
+		return _handlerDelegates.Get(handlerType, RequestHelper.MakeFastHandler<TResult>);
 	}
 }

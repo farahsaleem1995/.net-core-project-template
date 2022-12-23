@@ -2,11 +2,11 @@
 
 namespace DotnetCoreTemplate.WebAPI.Services;
 
-public class AspNetLogger<T> : IDomainLogger<T>
+public class AspNetLogger<T> : Application.Shared.Interfaces.ILogger<T>
 {
-	private readonly ILogger<T> _logger;
+	private readonly Microsoft.Extensions.Logging.ILogger<T> _logger;
 
-	public AspNetLogger(ILogger<T> logger)
+	public AspNetLogger(Microsoft.Extensions.Logging.ILogger<T> logger)
 	{
 		_logger = logger;
 	}

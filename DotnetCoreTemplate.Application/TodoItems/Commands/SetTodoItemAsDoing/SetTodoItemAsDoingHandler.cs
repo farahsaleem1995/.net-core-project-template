@@ -1,18 +1,17 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Exceptions;
 using DotnetCoreTemplate.Application.Shared.Interfaces;
 using DotnetCoreTemplate.Application.Shared.Models;
-using DotnetCoreTemplate.Application.TodoItems.Commands.SetTodoItemAsDoing;
 using DotnetCoreTemplate.Application.TodoItems.Specification;
 using DotnetCoreTemplate.Domain.Entities;
 
-namespace DotnetCoreTemplate.Application.TodoItems.Commands.SetTodoItemAsDone;
+namespace DotnetCoreTemplate.Application.TodoItems.Commands.SetTodoItemAsDoing;
 
-public class SetTodoItemAsDoneService : ICommandService<SetTodoItemAsDoneCommand>
+public class SetTodoItemAsDoingHandler : IRequestHandler<SetTodoItemAsDoingCommand>
 {
 	private readonly IUnitOfWork _unitOfWork;
 	private readonly IRepository<TodoItem> _todoItemsRepository;
 
-	public SetTodoItemAsDoneService(
+	public SetTodoItemAsDoingHandler(
 		IUnitOfWork unitOfWork,
 		IRepository<TodoItem> todoItemsRepository)
 	{
@@ -20,15 +19,15 @@ public class SetTodoItemAsDoneService : ICommandService<SetTodoItemAsDoneCommand
 		_todoItemsRepository = todoItemsRepository;
 	}
 
-	public async Task<Unit> Execute(SetTodoItemAsDoneCommand command, CancellationToken cancellation)
+	public async Task<Unit> Handle(SetTodoItemAsDoingCommand request, CancellationToken cancellation)
 	{
 		var todoItem = await _todoItemsRepository.FirstOrDefaultAsync(
-			new TodoItemByIdSpecification(command.Id));
+			new TodoItemByIdSpecification(request.Id));
 
 		if (todoItem == null)
-			throw new NotFoundException(typeof(TodoItem), command.Id);
+			throw new NotFoundException(typeof(TodoItem), request.Id);
 
-		todoItem.Done();
+		todoItem.Doing();
 
 		await _unitOfWork.SaveAsync();
 

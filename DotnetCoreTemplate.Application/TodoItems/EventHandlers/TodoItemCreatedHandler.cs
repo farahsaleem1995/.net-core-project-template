@@ -1,18 +1,18 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
 using DotnetCoreTemplate.Application.TodoItems.Events;
 
-namespace DotnetCoreTemplate.Application.TodoItems.Handlers;
+namespace DotnetCoreTemplate.Application.TodoItems.EventHandlers;
 
 public class TodoItemCreatedHandler : IEventHandler<TodoItemCreatedEvent>
 {
-	private readonly IDomainLogger<TodoItemCreatedHandler> _logger;
+	private readonly ILogger<TodoItemCreatedHandler> _logger;
 
-	public TodoItemCreatedHandler(IDomainLogger<TodoItemCreatedHandler> logger)
+	public TodoItemCreatedHandler(ILogger<TodoItemCreatedHandler> logger)
 	{
 		_logger = logger;
 	}
 
-	public Task Handle(TodoItemCreatedEvent domainEvent)
+	public Task Handle(TodoItemCreatedEvent domainEvent, CancellationToken cancellation)
 	{
 		_logger.LogMessage($"A new TODO Item was created with ID: '{domainEvent.Id}'");
 

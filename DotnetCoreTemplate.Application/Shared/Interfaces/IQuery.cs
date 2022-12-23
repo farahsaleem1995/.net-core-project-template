@@ -1,5 +1,5 @@
 ﻿namespace DotnetCoreTemplate.Application.Shared.Interfaces;
 
-public interface IQuery<TResult> : IOperation<TResult>
+public interface IQuery<TResult> : IRequest<TResult>
 {
 }
