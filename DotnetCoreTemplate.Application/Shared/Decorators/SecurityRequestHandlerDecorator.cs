@@ -41,7 +41,7 @@ public class SecurityRequestHandlerDecorator<TRequest, TResult> : IRequestHandle
 		}
 	}
 
-	private void CheckRole(UserRole requiredRole)
+	private void CheckRole(SecurityRole requiredRole)
 	{
 		if (_userContext.IsInRole(requiredRole))
 		{

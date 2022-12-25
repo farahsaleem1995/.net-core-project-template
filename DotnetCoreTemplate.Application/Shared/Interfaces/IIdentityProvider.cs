@@ -5,7 +5,7 @@ namespace DotnetCoreTemplate.Application.Shared.Interfaces;
 
 public interface IIdentityProvider
 {
-	Task<Result> RegisterUsertAsync(string email, string password, UserRole role, CancellationToken cancellation = default);
+	Task<Result> RegisterUsertAsync(string email, string password, SecurityRole role, CancellationToken cancellation = default);
 
 	Task<Result> SignInAsync(string userId, string password, CancellationToken cancellation = default);
 }

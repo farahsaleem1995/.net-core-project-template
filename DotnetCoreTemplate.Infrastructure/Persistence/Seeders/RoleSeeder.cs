@@ -6,7 +6,7 @@ namespace DotnetCoreTemplate.Infrastructure.Persistence.Seeders;
 
 public static class RoleSeeder
 {
-	public static ModelBuilder SeedRoles(this ModelBuilder builder, params UserRole[] roles)
+	public static ModelBuilder SeedRoles(this ModelBuilder builder, params SecurityRole[] roles)
 	{
 		foreach (var role in roles)
 		{

@@ -19,7 +19,7 @@ public class IdentityProvider : IIdentityProvider
 	}
 
 	public async Task<Result> RegisterUsertAsync(
-		string email, string password, UserRole role, CancellationToken cancellation = default)
+		string email, string password, SecurityRole role, CancellationToken cancellation = default)
 	{
 		var user = new ApplicationUser
 		{
@@ -30,7 +30,7 @@ public class IdentityProvider : IIdentityProvider
 		return await CreateUser(user, password, role);
 	}
 
-	private async Task<Result> CreateUser(ApplicationUser user, string password, UserRole role)
+	private async Task<Result> CreateUser(ApplicationUser user, string password, SecurityRole role)
 	{
 		var result = await _userManager.CreateAsync(user, password);
 		if (!result.Succeeded)
@@ -41,7 +41,7 @@ public class IdentityProvider : IIdentityProvider
 		return await AddToRole(user, role);
 	}
 
-	private async Task<Result> AddToRole(ApplicationUser user, UserRole role)
+	private async Task<Result> AddToRole(ApplicationUser user, SecurityRole role)
 	{
 		var result = await _userManager.AddToRoleAsync(user, role.ToString());
 

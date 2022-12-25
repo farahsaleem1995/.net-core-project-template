@@ -1,6 +1,6 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Enums;
 using DotnetCoreTemplate.Application.Shared.Interfaces;
-using DotnetCoreTemplate.Application.Shared.Models;
+using DotnetCoreTemplate.Domain.Entities;
 using Microsoft.Net.Http.Headers;
 using System.Security.Claims;
 
@@ -45,7 +45,7 @@ public class AspNetUserContextAdapter : IUserContext
 		}
 	}
 
-	public bool IsInRole(UserRole role)
+	public bool IsInRole(SecurityRole role)
 	{
 		var roles = _accessor.HttpContext?.User.Claims.Where(c => c.Type == ClaimTypes.Role) ?? new List<Claim>();
 

@@ -18,12 +18,18 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
 
 	public DbSet<RefreshToken> RefreshTokens { get; set; }
 
+	public DbSet<User> UsersView { get; set; }
+
+	public DbSet<Role> RolesView { get; set; }
+
+	public DbSet<UserRole> UserRolesView { get; set; }
+
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
 		base.OnModelCreating(modelBuilder);
 
 		modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
 
-		modelBuilder.SeedRoles(UserRole.Administrator, UserRole.Individual);
+		modelBuilder.SeedRoles(SecurityRole.Administrator, SecurityRole.Individual);
 	}
 }

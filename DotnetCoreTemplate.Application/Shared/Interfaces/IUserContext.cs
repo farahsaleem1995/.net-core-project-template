@@ -1,5 +1,5 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Enums;
-using DotnetCoreTemplate.Application.Shared.Models;
+using DotnetCoreTemplate.Domain.Entities;
 
 namespace DotnetCoreTemplate.Application.Shared.Interfaces;
 
@@ -11,7 +11,7 @@ public interface IUserContext
 
 	string AccessToken { get; }
 
-	bool IsInRole(UserRole role);
+	bool IsInRole(SecurityRole role);
 
 	Task<User> CurrentUser();
 }

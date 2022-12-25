@@ -5,10 +5,10 @@ namespace DotnetCoreTemplate.Application.Shared.Attributes;
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
 public class SecurityAttribute : Attribute
 {
-    public SecurityAttribute(UserRole role)
+    public SecurityAttribute(SecurityRole role)
     {
         Role = role;
     }
 
-    public UserRole Role { get; }
+    public SecurityRole Role { get; }
 }

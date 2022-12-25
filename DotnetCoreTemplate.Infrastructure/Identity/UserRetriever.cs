@@ -1,45 +1,39 @@
-﻿using DotnetCoreTemplate.Application.Shared.Enums;
-using DotnetCoreTemplate.Application.Shared.Interfaces;
-using DotnetCoreTemplate.Application.Shared.Models;
-using Microsoft.AspNetCore.Identity;
+﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
+using DotnetCoreTemplate.Domain.Entities;
+using DotnetCoreTemplate.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace DotnetCoreTemplate.Infrastructure.Identity;
 
 public class UserRetriever : IUserRetriever
 {
-	private readonly UserManager<ApplicationUser> _userManager;
+	private readonly ApplicationDbContext _dbContext;
 
-	public UserRetriever(UserManager<ApplicationUser> userManager)
+	public UserRetriever(ApplicationDbContext dbContext)
 	{
-		_userManager = userManager;
+		_dbContext = dbContext;
 	}
 
 	public async Task<User?> GetUserById(string userId, CancellationToken cancellation = default)
 	{
-		var user = await _userManager.FindByIdAsync(userId);
-		if (user == null)
-		{
-			return null;
-		}
+		var aggregate = UserAggregate(u => u.Id == userId);
 
-		return await UserWithRole(user);
-	}
-
-	private async Task<User> UserWithRole(ApplicationUser user)
-	{
-		var roles = await _userManager.GetRolesAsync(user);
-
-		return new User(user.Id, user.Email!, Enum.Parse<UserRole>(roles.First()));
+		return await aggregate.FirstOrDefaultAsync(cancellation);
 	}
 
 	public async Task<User?> GetUserByEmai(string email, CancellationToken cancellation = default)
 	{
-		var user = await _userManager.FindByEmailAsync(email);
-		if (user == null)
-		{
-			return null;
-		}
+		var aggregate = UserAggregate(u => u.Email == email);
 
-		return await UserWithRole(user);
+		return await aggregate.FirstOrDefaultAsync(cancellation);
+	}
+
+	private IQueryable<User> UserAggregate(Expression<Func<User, bool>> filter)
+	{
+		return _dbContext.UsersView
+			.Include(u => u.Roles)
+			.ThenInclude(ur => ur.Role)
+			.Where(filter);
 	}
 }

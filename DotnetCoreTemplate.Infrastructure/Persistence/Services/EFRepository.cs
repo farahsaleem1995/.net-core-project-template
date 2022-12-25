@@ -87,11 +87,11 @@ public class EFRepository<TEntity> : IRepository<TEntity> where TEntity : class
 		return await Paginate(resultQuery, specification, cancellation);
 	}
 
-	private static async Task<PaginatedList<T>> Paginate<T>(
+	private async Task<PaginatedList<T>> Paginate<T>(
 		IQueryable<T> query, IPaginationSpecification specification, CancellationToken cancellation)
 	{
 		var items = await query.ToListAsync(cancellation);
-		var totalItems = await query.CountAsync(cancellation);
+		var totalItems = await _dbContext.Set<TEntity>().CountAsync(cancellation);
 
 		return new PaginatedList<T>(items, totalItems, specification.PageNumber, specification.PageSize);
 	}

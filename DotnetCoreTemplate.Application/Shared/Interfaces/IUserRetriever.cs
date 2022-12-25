@@ -1,4 +1,4 @@
-﻿using DotnetCoreTemplate.Application.Shared.Models;
+﻿using DotnetCoreTemplate.Domain.Entities;
 
 namespace DotnetCoreTemplate.Application.Shared.Interfaces;
 

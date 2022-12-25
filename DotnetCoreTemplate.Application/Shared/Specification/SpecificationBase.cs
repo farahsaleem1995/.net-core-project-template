@@ -49,9 +49,9 @@ public abstract class SpecificationBase<TEntity> :
 		return this;
 	}
 
-	public SpecificationBase<TEntity> Include(IncludeExpression<TEntity> includeExpression)
+	public SpecificationBase<TEntity> Include(Expression<Func<TEntity, object>> expression)
 	{
-		_includeExpressions.Add(includeExpression);
+		_includeExpressions.Add(new IncludeExpression<TEntity>(expression));
 
 		return this;
 	}

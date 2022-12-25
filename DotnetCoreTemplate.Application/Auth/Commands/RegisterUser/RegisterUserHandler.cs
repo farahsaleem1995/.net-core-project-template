@@ -17,7 +17,7 @@ public class RegisterUserHandler : IRequestHandler<RegisterUserCommand>
 	public async Task<Unit> Handle(RegisterUserCommand request, CancellationToken cancellation)
 	{
 		var result = await _identityProvider.RegisterUsertAsync(
-			request.Email, request.Password, UserRole.Individual, cancellation);
+			request.Email, request.Password, SecurityRole.Individual, cancellation);
 
 		if (!result.Succeeded)
 		{

@@ -1,7 +1,7 @@
 ﻿namespace DotnetCoreTemplate.Application.Shared.Enums;
 
-public enum UserRole
+public enum SecurityRole
 {
-    Individual,
-    Administrator
+	Individual,
+	Administrator
 }
