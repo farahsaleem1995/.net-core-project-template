@@ -29,7 +29,7 @@ public class Director : IDirector
 		var requestType = request.GetType();
 		var handlerType = GetHandlerType<TResult>(requestType);
 
-		return await CallHandler<TResult>(request, handlerType.Type, cancellation);
+		return await CallHandler<TResult>(handlerType.Type, request, cancellation);
 	}
 
 	private RequestHandlerType GetHandlerType<TResult>(Type requestType)
@@ -38,11 +38,11 @@ public class Director : IDirector
 	}
 
 	private async Task<TResult> CallHandler<TResult>(
-		object request, Type requestType, CancellationToken cancellation)
+		Type handlerType, object request, CancellationToken cancellation)
 	{
-		var handlerInstance = _container.GetInstance(requestType);
+		var handlerInstance = _container.GetInstance(handlerType);
 
-		var fastHandler = MakeFastHandler<TResult>(requestType);
+		var fastHandler = MakeFastHandler<TResult>(handlerType);
 
 		var result = fastHandler(handlerInstance, request, cancellation);
 
