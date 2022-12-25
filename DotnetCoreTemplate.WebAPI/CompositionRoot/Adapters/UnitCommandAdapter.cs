@@ -4,12 +4,12 @@ using SimpleInjector;
 
 namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Adapters;
 
-public class UnitRequestAdapter<TRequest> : IRequestHandler<TRequest>
-	where TRequest : IRequest
+public class UnitCommandAdapter<TRequest> : IRequestHandler<TRequest>
+	where TRequest : ICommand
 {
 	private readonly Container _container;
 
-	public UnitRequestAdapter(Container container)
+	public UnitCommandAdapter(Container container)
 	{
 		_container = container;
 	}

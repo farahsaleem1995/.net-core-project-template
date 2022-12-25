@@ -1,6 +1,7 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Decorators;
 using DotnetCoreTemplate.Application.Shared.Interfaces;
 using DotnetCoreTemplate.Application.Shared.Services;
+using DotnetCoreTemplate.Infrastructure.Identity;
 using DotnetCoreTemplate.Infrastructure.Persistence;
 using DotnetCoreTemplate.Infrastructure.Persistence.Decorator;
 using DotnetCoreTemplate.Infrastructure.Persistence.Interfaces;
@@ -11,9 +12,13 @@ using DotnetCoreTemplate.WebAPI.CompositionRoot.Services;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Utils;
 using DotnetCoreTemplate.WebAPI.Extensions;
 using DotnetCoreTemplate.WebAPI.Services;
-using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using SimpleInjector;
+using System.Text;
 using System.Text.Json.Serialization;
 
 namespace DotnetCoreTemplate.WebAPI.CompositionRoot;
@@ -57,7 +62,35 @@ public class SimpleInjectorServiceConfigurator
 
 		_services.AddRazorPages();
 		_services.AddEndpointsApiExplorer();
-		_services.AddSwaggerGen();
+		_services.AddSwaggerGen(c =>
+		{
+			c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+			{
+				Name = "Authorization",
+				Type = SecuritySchemeType.ApiKey,
+				Scheme = "Bearer",
+				BearerFormat = "JWT",
+				In = ParameterLocation.Header,
+				Description = @"JWT Authorization header using the Bearer scheme.
+					Enter 'Bearer' [space] and then your token in the text input below.
+					'Bearer 12345abcdef'",
+			});
+
+			c.AddSecurityRequirement(new OpenApiSecurityRequirement
+			{
+				{
+					new OpenApiSecurityScheme
+					{
+						Reference = new OpenApiReference
+						{
+							Type = ReferenceType.SecurityScheme,
+							Id = "Bearer"
+						}
+					},
+					Array.Empty<string>()
+				}
+			});
+		});
 		_services.AddLogging();
 		_services.AddHttpContextAccessor();
 		_services.AddLocalization(options => options.ResourcesPath = "Resources");
@@ -71,10 +104,67 @@ public class SimpleInjectorServiceConfigurator
 			});
 		});
 
-		_services.Configure<RouteOptions>(options =>
+		_services.AddIdentity<ApplicationUser, ApplicationRole>()
+			.AddEntityFrameworkStores<ApplicationDbContext>()
+			.AddDefaultTokenProviders();
+
+		_services.Configure<IdentityOptions>(options =>
 		{
-			options.LowercaseUrls = true;
+			options.User.RequireUniqueEmail = true;
+
+			options.Password.RequireDigit = true;
+			options.Password.RequireLowercase = false;
+			options.Password.RequireNonAlphanumeric = false;
+			options.Password.RequireUppercase = false;
+			options.Password.RequiredLength = 6;
+			options.Password.RequiredUniqueChars = 1;
+
+			options.Lockout.AllowedForNewUsers = true;
+			options.Lockout.MaxFailedAccessAttempts = 5;
+			options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+
+			options.SignIn.RequireConfirmedEmail = false;
 		});
+
+		_services.Configure<TokenConfig>(_configuration.GetSection("TokenConfig"));
+
+		_services
+			.AddAuthentication(options =>
+			{
+				options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+				options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+				options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+			})
+			.AddJwtBearer(options =>
+			{
+				options.SaveToken = true;
+				options.RequireHttpsMetadata = false;
+				options.TokenValidationParameters = new()
+				{
+					ValidateLifetime = true,
+					ValidateIssuerSigningKey = true,
+					ValidIssuer = _configuration["TokenConfig:Issuer"],
+					ValidateIssuer = _configuration.GetValue<bool>("TokenConfig:ValidateIssuer"),
+					ValidAudience = _configuration["TokenConfig:Audience"],
+					ValidateAudience = _configuration.GetValue<bool>("TokenConfig:ValidateAudience"),
+					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["TokenConfig:Key"]!)),
+				};
+				options.Events = new JwtBearerEvents
+				{
+					OnMessageReceived = context =>
+					{
+						var accessToken = context.Request.Query["access_token"];
+						if (!string.IsNullOrEmpty(accessToken))
+						{
+							context.Token = accessToken;
+						}
+
+						return Task.CompletedTask;
+					}
+				};
+			});
+
+		_services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
 		_services.AddSimpleInjector(_container, options =>
 		{
@@ -99,7 +189,7 @@ public class SimpleInjectorServiceConfigurator
 	private void RegisterApplication()
 	{
 		_container.Register(typeof(IRequestHandler<,>), typeof(IRequestHandler<,>).Assembly);
-		_container.Register(typeof(IRequestHandler<>), typeof(UnitRequestAdapter<>));
+		_container.Register(typeof(IRequestHandler<>), typeof(UnitCommandAdapter<>));
 		_container.RegisterDecorator(typeof(IRequestHandler<,>), typeof(TransactionRequestHandlerDecorator<,>));
 		_container.RegisterDecorator(typeof(IRequestHandler<,>), typeof(ValidationRequestHandlerDecorator<,>));
 		_container.RegisterDecorator(typeof(IRequestHandler<,>), typeof(SecurityRequestHandlerDecorator<,>));
@@ -110,7 +200,7 @@ public class SimpleInjectorServiceConfigurator
 		_container.Register<IEventDispatcher, EventDispatcher>();
 
 		_container.Collection.Register(typeof(FluentValidation.IValidator<>), typeof(IRequestHandler<,>).Assembly);
-		_container.Register(typeof(Application.Shared.Interfaces.IValidator<>), typeof(FluentValidator<>));
+		_container.Register(typeof(IValidator<>), typeof(FluentValidator<>));
 	}
 
 	private void RegisterApi()
@@ -144,5 +234,11 @@ public class SimpleInjectorServiceConfigurator
 		_container.Register<ISpecificationProjector, EFFSpecificationProjector>(Lifestyle.Scoped);
 
 		_container.Register<ITimeProvider, UtcTimeProvider>(Lifestyle.Scoped);
+
+		_container.Register<IIdentityProvider, IdentityProvider>(Lifestyle.Scoped);
+
+		_container.Register<IUserRetriever, UserRetriever>(Lifestyle.Scoped);
+
+		_container.Register<ITokenProvider, TokenProvider>(Lifestyle.Scoped);
 	}
 }
