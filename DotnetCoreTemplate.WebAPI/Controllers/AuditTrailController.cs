@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DotnetCoreTemplate.WebAPI.Controllers;
 
+[Route("audit-trail")]
 public class AuditTrailController : ApiControllerBase
 {
 	public AuditTrailController(IDirector director) : base(director)
