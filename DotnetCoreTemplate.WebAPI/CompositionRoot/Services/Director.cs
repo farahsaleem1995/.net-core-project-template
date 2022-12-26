@@ -4,37 +4,28 @@ using SimpleInjector;
 
 namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Services;
 
-public record RequestHandlerType(Type Type);
-
 public delegate object FastRequestHandler(object handler, object request, CancellationToken cancellation);
 
 public class Director : IDirector
 {
 	private readonly Container _container;
-	private readonly ILocalCache<Type, RequestHandlerType> _handlerTypes;
 	private readonly ILocalCache<Type, FastRequestHandler> _handlerDelegates;
 
 	public Director(
 		Container container,
-		ILocalCache<Type, RequestHandlerType> handlerTypes,
 		ILocalCache<Type, FastRequestHandler> handlerDelegates)
 	{
 		_container = container;
-		_handlerTypes = handlerTypes;
 		_handlerDelegates = handlerDelegates;
 	}
 
 	public async Task<TResult> Send<TResult>(IRequest<TResult> request, CancellationToken cancellation)
 	{
 		var requestType = request.GetType();
-		var handlerType = GetHandlerType<TResult>(requestType);
 
-		return await CallHandler<TResult>(handlerType.Type, request, cancellation);
-	}
+		var handlerType = RequestHelper.MaketHandlerType<TResult>(requestType);
 
-	private RequestHandlerType GetHandlerType<TResult>(Type requestType)
-	{
-		return _handlerTypes.Get(requestType, RequestHelper.MaketHandlerType<TResult>);
+		return await CallHandler<TResult>(handlerType, request, cancellation);
 	}
 
 	private async Task<TResult> CallHandler<TResult>(

@@ -9,9 +9,9 @@ public static class RequestHelper
 	private static readonly MethodInfo _callHandlerOpenGenericMethod =
 		typeof(RequestHelper).GetTypeInfo().GetDeclaredMethod(nameof(CallHandler))!;
 
-	public static RequestHandlerType MaketHandlerType<TResult>(Type requestType)
+	public static Type MaketHandlerType<TResult>(Type requestType)
 	{
-		return new(typeof(IRequestHandler<,>).MakeGenericType(requestType, typeof(TResult)));
+		return typeof(IRequestHandler<,>).MakeGenericType(requestType, typeof(TResult));
 	}
 
 	public static FastRequestHandler MakeFastHandler<TResult>(Type handlerType)
