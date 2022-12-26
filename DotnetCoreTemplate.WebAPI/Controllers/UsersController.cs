@@ -1,4 +1,5 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
+using DotnetCoreTemplate.Application.Users.CreateUser;
 using DotnetCoreTemplate.Application.Users.GetUserById;
 using DotnetCoreTemplate.Application.Users.GetUsers;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +19,15 @@ public class UsersController : ApiControllerBase
 		var users = await Director.Send(query, cancellation);
 
 		return Ok(users);
+	}
+
+	[HttpPost]
+	public async Task<IActionResult> Get(
+		[FromBody] CreateUserCommand command, CancellationToken cancellation)
+	{
+		await Director.Send(command, cancellation);
+
+		return NoContent();
 	}
 
 	[HttpGet("{id}")]

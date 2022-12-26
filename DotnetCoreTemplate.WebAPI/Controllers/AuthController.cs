@@ -32,10 +32,9 @@ public class AuthController : ApiControllerBase
 	}
 
 	[HttpPost("sign-out")]
-	public async Task<IActionResult> SignOut(
-		[FromBody] SignOutCommand command, CancellationToken cancellation)
+	public async Task<IActionResult> SignOut(CancellationToken cancellation)
 	{
-		await Director.Send(command, cancellation);
+		await Director.Send(new SignOutCommand(), cancellation);
 
 		return NoContent();
 	}
