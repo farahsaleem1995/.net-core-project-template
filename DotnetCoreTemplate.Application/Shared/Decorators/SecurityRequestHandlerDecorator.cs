@@ -35,7 +35,7 @@ public class SecurityRequestHandlerDecorator<TRequest, TResult> : IRequestHandle
 
 	private void CheckAuthorization()
 	{
-		if (_userContext.Authorized)
+		if (!_userContext.Authorized)
 		{
 			throw new SecurityException();
 		}
@@ -43,7 +43,7 @@ public class SecurityRequestHandlerDecorator<TRequest, TResult> : IRequestHandle
 
 	private void CheckRole(SecurityRole requiredRole)
 	{
-		if (_userContext.IsInRole(requiredRole))
+		if (!_userContext.IsInRole(requiredRole))
 		{
 			throw new SecurityException(SecurityError.AccessDenial);
 		}

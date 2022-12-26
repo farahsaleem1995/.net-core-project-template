@@ -37,6 +37,10 @@ public static class InfrastructureContainerExtensions
 
 		container.Register<ITokenProvider, TokenProvider>(Lifestyle.Scoped);
 
+		container.Register<IAuditTrailAppender, EFAuditTrailAppender>(Lifestyle.Scoped);
+
+		container.Register<IAuditTrailRetriever, EFAuditTrailRetriever>(Lifestyle.Scoped);
+
 		return container;
 	}
 }

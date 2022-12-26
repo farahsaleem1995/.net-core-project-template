@@ -24,6 +24,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
 
 	public DbSet<UserRole> UserRolesView { get; set; }
 
+	public DbSet<AuditEntry> AuditEntries { get; set; }
+
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
 		base.OnModelCreating(modelBuilder);

@@ -19,7 +19,7 @@ public class AspNetUserContextAdapter : IUserContext
 		_userRetriever = userRetriever;
 	}
 
-	public bool Authorized => _accessor.HttpContext?.User != null;
+	public bool Authorized => !string.IsNullOrEmpty(UserId);
 
 	public string UserId
 	{

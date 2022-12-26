@@ -13,6 +13,7 @@ public static class ApplicationContainerExtensions
 	{
 		container.Register(typeof(IRequestHandler<,>), typeof(IRequestHandler<,>).Assembly);
 		container.Register(typeof(IRequestHandler<>), typeof(UnitCommandAdapter<>));
+		container.RegisterDecorator(typeof(IRequestHandler<,>), typeof(AuditingRequestHandlerDecorator<,>));
 		container.RegisterDecorator(typeof(IRequestHandler<,>), typeof(TransactionRequestHandlerDecorator<,>));
 		container.RegisterDecorator(typeof(IRequestHandler<,>), typeof(ValidationRequestHandlerDecorator<,>));
 		container.RegisterDecorator(typeof(IRequestHandler<,>), typeof(SecurityRequestHandlerDecorator<,>));
