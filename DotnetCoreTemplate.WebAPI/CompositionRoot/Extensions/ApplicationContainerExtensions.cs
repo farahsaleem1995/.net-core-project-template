@@ -2,6 +2,7 @@
 using DotnetCoreTemplate.Application.Shared.Interfaces;
 using DotnetCoreTemplate.Application.Shared.Services;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Adapters;
+using DotnetCoreTemplate.WebAPI.CompositionRoot.Composites;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Services;
 using SimpleInjector;
 

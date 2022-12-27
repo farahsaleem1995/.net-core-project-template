@@ -1,7 +1,7 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
 using DotnetCoreTemplate.Domain.Shared;
 
-namespace DotnetCoreTemplate.Application.Shared.Services;
+namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Composites;
 
 public class CompositeEventHandler<TEvent> : IEventHandler<TEvent>
 	where TEvent : DomainEvent
