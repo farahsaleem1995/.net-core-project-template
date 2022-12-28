@@ -20,11 +20,14 @@ public class WorkExecutor : IWorkExecutor
 		_workExecutors = workExecutors;
 	}
 
-	public async Task Execute(object work, CancellationToken cancellation)
+	public async Task Execute<TWork>(TWork work, CancellationToken cancellation)
 	{
-		var workType = work.GetType();
+		if (work == null)
+		{
+			throw new ArgumentNullException(nameof(work));
+		}
 
-		var workerType = typeof(IWorker<>).MakeGenericType(workType); ;
+		var workerType = typeof(IWorker<>).MakeGenericType(typeof(TWork));
 
 		await CallWorker(workerType, work, cancellation);
 	}

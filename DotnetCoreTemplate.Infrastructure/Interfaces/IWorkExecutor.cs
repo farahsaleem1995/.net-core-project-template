@@ -2,5 +2,5 @@
 
 public interface IWorkExecutor
 {
-	Task Execute(object work, CancellationToken cancellation);
+	Task Execute<TWork>(TWork work, CancellationToken cancellation);
 }

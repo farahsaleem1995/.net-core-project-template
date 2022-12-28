@@ -1,6 +1,4 @@
-﻿using DotnetCoreTemplate.Application.Shared.Enums;
-using DotnetCoreTemplate.Application.Shared.Interfaces;
-using DotnetCoreTemplate.Application.Shared.Models;
+﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
 using DotnetCoreTemplate.Infrastructure.Background;
 using DotnetCoreTemplate.Infrastructure.Extensions;
 using Quartz;
@@ -30,11 +28,11 @@ public class QuartzQueueProvider : IQueueProvider
 	{
 		var scheduler = await _schedulerFactory.GetScheduler();
 
-		var name = typeof(TWork).FullName;
+		var name = $"{typeof(TWork).Name}_{Guid.NewGuid()}"; ;
 		var group = "Default";
 		var dataMap = GetJobDataMap(work);
 
-		var jobDetail = BuildJob(name, group, dataMap);
+		var jobDetail = BuildJob<TWork>(name, group, dataMap);
 		var trigger = BuildTrigger(name, group, firingTime);
 
 		await scheduler.ScheduleJob(jobDetail, trigger);
@@ -44,14 +42,13 @@ public class QuartzQueueProvider : IQueueProvider
 	{
 		var dataMap = new JobDataMap();
 		dataMap.Put("SerializedWork", work.Serialize());
-		dataMap.Put("WorkType", $"{typeof(TWork)}, {typeof(TWork).Assembly}");
 
 		return dataMap;
 	}
 
-	private static IJobDetail BuildJob(string name, string group, JobDataMap dataMap)
+	private static IJobDetail BuildJob<TWork>(string name, string group, JobDataMap dataMap)
 	{
-		return JobBuilder.Create<QuartzJob>()
+		return JobBuilder.Create<QuartzJob<TWork>>()
 			.WithIdentity(name, group)
 			.UsingJobData(dataMap)
 			.Build();

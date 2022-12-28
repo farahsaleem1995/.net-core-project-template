@@ -9,26 +9,17 @@ namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Factories;
 public class SimpleInjectorJobFactory : IJobFactory
 {
 	private readonly Container _container;
-	private readonly Dictionary<Type, InstanceProducer> _jobProducers;
 
 	public SimpleInjectorJobFactory(Container container)
 	{
 		_container = container;
-
-		// By creating producers, jobs can be decorated.
-		var assemblies = new[] { typeof(QuartzJob).Assembly };
-		_jobProducers = container.GetTypesToRegister(typeof(IJob), assemblies).ToDictionary(
-			type => type,
-			type => Lifestyle.Transient.CreateProducer(typeof(IJob), type, container));
 	}
 
 	public IJob NewJob(TriggerFiredBundle bundle, IScheduler scheduler)
 	{
-		var jobProducer = _jobProducers[bundle.JobDetail.JobType];
-
 		return new AsyncScopedJobDecorator(
 			_container,
-			() => (IJob)jobProducer.GetInstance());
+			() => (IJob)_container.GetInstance(bundle.JobDetail.JobType));
 	}
 
 	public void ReturnJob(IJob job)

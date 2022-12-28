@@ -1,11 +1,10 @@
-﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
-using DotnetCoreTemplate.Infrastructure.Extensions;
+﻿using DotnetCoreTemplate.Infrastructure.Extensions;
 using DotnetCoreTemplate.Infrastructure.Interfaces;
 using Quartz;
 
 namespace DotnetCoreTemplate.Infrastructure.Background;
 
-public class QuartzJob : IJob
+public class QuartzJob<TWork> : IJob
 {
 	private readonly IWorkExecutor _executor;
 
@@ -16,13 +15,7 @@ public class QuartzJob : IJob
 
 	public async Task Execute(IJobExecutionContext context)
 	{
-		var workType = GetWorkType(context);
-		if (workType == null)
-		{
-			return;
-		}
-
-		var work = GetWork(context, workType);
+		var work = GetWork(context);
 		if (work == null)
 		{
 			return;
@@ -31,31 +24,14 @@ public class QuartzJob : IJob
 		await _executor.Execute(work, context.CancellationToken);
 	}
 
-	private static Type? GetWorkType(IJobExecutionContext context)
-	{
-		var workTypeName = context.MergedJobDataMap.GetString("WorkType");
-		if (string.IsNullOrEmpty(workTypeName))
-		{
-			return null;
-		}
-
-		var workType = Type.GetType(workTypeName);
-		if (workType == null)
-		{
-			return null;
-		}
-
-		return workType;
-	}
-
-	private static object? GetWork(IJobExecutionContext context, Type workType)
+	private static TWork? GetWork(IJobExecutionContext context)
 	{
 		var serializedWork = context.MergedJobDataMap.GetString("SerializedWork");
 		if (serializedWork == null)
 		{
-			return null;
+			return default;
 		}
 
-		return serializedWork.Deserialize(workType);
+		return serializedWork.Deserialize<TWork>();
 	}
 }
