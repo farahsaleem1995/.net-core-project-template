@@ -1,15 +1,14 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
-using DotnetCoreTemplate.Infrastructure.Background;
 using DotnetCoreTemplate.Infrastructure.Extensions;
 using Quartz;
 
-namespace DotnetCoreTemplate.Infrastructure.Services;
+namespace DotnetCoreTemplate.Infrastructure.Background;
 
-public class QuartzQueueProvider : IQueueProvider
+public class QueueProvider : IQueueProvider
 {
 	private readonly ISchedulerFactory _schedulerFactory;
 
-	public QuartzQueueProvider(ISchedulerFactory schedulerFactory)
+	public QueueProvider(ISchedulerFactory schedulerFactory)
 	{
 		_schedulerFactory = schedulerFactory;
 	}

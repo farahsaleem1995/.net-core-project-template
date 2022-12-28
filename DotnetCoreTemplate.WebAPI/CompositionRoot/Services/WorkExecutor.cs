@@ -1,5 +1,5 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
-using DotnetCoreTemplate.Infrastructure.Interfaces;
+using DotnetCoreTemplate.Infrastructure.Background;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Extensions;
 using SimpleInjector;
 

@@ -1,4 +1,4 @@
-﻿namespace DotnetCoreTemplate.Infrastructure.Interfaces;
+﻿namespace DotnetCoreTemplate.Infrastructure.Background;
 
 public interface IWorkExecutor
 {

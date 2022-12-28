@@ -1,5 +1,4 @@
 ﻿using DotnetCoreTemplate.Infrastructure.Extensions;
-using DotnetCoreTemplate.Infrastructure.Interfaces;
 using Quartz;
 
 namespace DotnetCoreTemplate.Infrastructure.Background;
