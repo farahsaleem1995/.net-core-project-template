@@ -4,7 +4,7 @@ using DotnetCoreTemplate.WebAPI.CompositionRoot.Utils;
 using DotnetCoreTemplate.WebAPI.Services;
 using SimpleInjector;
 
-namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Extensions;
+namespace DotnetCoreTemplate.WebAPI.CompositionRoot.DIConfiguration;
 
 public static class ApiContainerExtensions
 {

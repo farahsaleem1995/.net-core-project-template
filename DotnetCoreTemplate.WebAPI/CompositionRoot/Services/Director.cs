@@ -1,10 +1,10 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
-using DotnetCoreTemplate.WebAPI.CompositionRoot.Helpers;
+using DotnetCoreTemplate.WebAPI.CompositionRoot.Extensions;
 using SimpleInjector;
 
 namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Services;
 
-public delegate object FastRequestHandler(object handler, object request, CancellationToken cancellation);
+public delegate object FastRequestHandler(object handler, object request, object cancellation);
 
 public class Director : IDirector
 {
@@ -23,7 +23,7 @@ public class Director : IDirector
 	{
 		var requestType = request.GetType();
 
-		var handlerType = RequestHelper.MaketHandlerType<TResult>(requestType);
+		var handlerType = typeof(IRequestHandler<,>).MakeGenericType(requestType, typeof(TResult));
 
 		return await CallHandler<TResult>(handlerType, request, cancellation);
 	}
@@ -42,6 +42,7 @@ public class Director : IDirector
 
 	private FastRequestHandler MakeFastHandler<TResult>(Type handlerType)
 	{
-		return _handlerDelegates.Get(handlerType, RequestHelper.MakeFastHandler<TResult>);
+		return _handlerDelegates.Get(handlerType,
+			_ => handlerType.MakeFastMethodCaller<FastRequestHandler>("Handle"));
 	}
 }

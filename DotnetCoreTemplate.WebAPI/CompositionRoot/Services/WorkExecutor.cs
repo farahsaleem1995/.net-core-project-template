@@ -1,11 +1,11 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
 using DotnetCoreTemplate.Infrastructure.Interfaces;
-using DotnetCoreTemplate.WebAPI.CompositionRoot.Helpers;
+using DotnetCoreTemplate.WebAPI.CompositionRoot.Extensions;
 using SimpleInjector;
 
-namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Adapters;
+namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Services;
 
-public delegate object FastWorkExecutor(object worker, object work, CancellationToken cancellation);
+public delegate object FastWorkExecutor(object worker, object work, object cancellation);
 
 public class WorkExecutor : IWorkExecutor
 {
@@ -24,7 +24,7 @@ public class WorkExecutor : IWorkExecutor
 	{
 		var workType = work.GetType();
 
-		var workerType = WorkerHelper.MaketWorkerType(workType);
+		var workerType = typeof(IWorker<>).MakeGenericType(workType); ;
 
 		await CallWorker(workerType, work, cancellation);
 	}
@@ -42,6 +42,7 @@ public class WorkExecutor : IWorkExecutor
 
 	private FastWorkExecutor MakeFastExecutor(Type workerType)
 	{
-		return _workExecutors.Get(workerType, WorkerHelper.MakeFastExecutor);
+		return _workExecutors.Get(workerType,
+			_ => workerType.MakeFastMethodCaller<FastWorkExecutor>("Execute"));
 	}
 }

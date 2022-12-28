@@ -6,7 +6,7 @@ using DotnetCoreTemplate.Infrastructure.Persistence.Services;
 using DotnetCoreTemplate.Infrastructure.Services;
 using SimpleInjector;
 
-namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Extensions;
+namespace DotnetCoreTemplate.WebAPI.CompositionRoot.DIConfiguration;
 
 public static class InfrastructureContainerExtensions
 {

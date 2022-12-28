@@ -1,4 +1,4 @@
-﻿using DotnetCoreTemplate.WebAPI.CompositionRoot.Extensions;
+﻿using DotnetCoreTemplate.WebAPI.CompositionRoot.DIConfiguration;
 using SimpleInjector;
 
 namespace DotnetCoreTemplate.WebAPI.CompositionRoot;

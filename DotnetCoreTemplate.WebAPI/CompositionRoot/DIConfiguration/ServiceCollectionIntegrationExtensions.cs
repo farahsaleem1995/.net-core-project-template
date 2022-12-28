@@ -12,7 +12,7 @@ using SimpleInjector;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Extensions;
+namespace DotnetCoreTemplate.WebAPI.CompositionRoot.DIConfiguration;
 
 public static class ServiceCollectionIntegrationExtensions
 {
