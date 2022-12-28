@@ -10,7 +10,7 @@ public static class BackgroundContainerExtensions
 {
 	public static Container RegisterBackgroundServices(this Container container)
 	{
-		container.Register<IQueueProvider, QueueProvider>(Lifestyle.Singleton);
+		container.Register<IScheduleProvider, QuartzScheduleProvider>(Lifestyle.Singleton);
 
 		container.Register<IWorkExecutor, WorkExecutor>();
 

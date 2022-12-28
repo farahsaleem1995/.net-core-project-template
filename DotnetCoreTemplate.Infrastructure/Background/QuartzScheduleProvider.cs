@@ -4,28 +4,28 @@ using Quartz;
 
 namespace DotnetCoreTemplate.Infrastructure.Background;
 
-public class QueueProvider : IQueueProvider
+public class QuartzScheduleProvider : IScheduleProvider
 {
 	private readonly ISchedulerFactory _schedulerFactory;
 
-	public QueueProvider(ISchedulerFactory schedulerFactory)
+	public QuartzScheduleProvider(ISchedulerFactory schedulerFactory)
 	{
 		_schedulerFactory = schedulerFactory;
 	}
 
-	public async Task Queue<TWork>(TWork work, DateTime? firingTime = null)
+	public async Task Schedule<TWork>(TWork work, DateTime firingTime, CancellationToken cancellation = default)
 	{
-		if (firingTime == null)
+		if (work == null)
 		{
-			throw new ArgumentNullException(nameof(firingTime));
+			throw new ArgumentNullException(nameof(work));
 		}
 
-		await ScheduleJob(work, firingTime.Value);
+		await SchedulrJob(work, firingTime, cancellation);
 	}
 
-	private async Task ScheduleJob<TWork>(TWork work, DateTime firingTime)
+	private async Task SchedulrJob<TWork>(TWork work, DateTime firingTime, CancellationToken cancellation)
 	{
-		var scheduler = await _schedulerFactory.GetScheduler();
+		var scheduler = await _schedulerFactory.GetScheduler(cancellation);
 
 		var name = $"{typeof(TWork).Name}_{Guid.NewGuid()}"; ;
 		var group = "Default";
@@ -34,7 +34,7 @@ public class QueueProvider : IQueueProvider
 		var jobDetail = BuildJob<TWork>(name, group, dataMap);
 		var trigger = BuildTrigger(name, group, firingTime);
 
-		await scheduler.ScheduleJob(jobDetail, trigger);
+		await scheduler.ScheduleJob(jobDetail, trigger, cancellation);
 	}
 
 	private static JobDataMap GetJobDataMap<TWork>(TWork work)
