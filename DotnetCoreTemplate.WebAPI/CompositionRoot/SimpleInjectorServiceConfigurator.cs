@@ -22,8 +22,10 @@ public class SimpleInjectorServiceConfigurator
 	public void Configure()
 	{
 		_container.IntegrateWithServiceCollection(_services, _configuration)
-			.RegisterApplication()
-			.RegisterInfrastructure()
-			.RegisterWebApi();
+			.RegisterDomainServices()
+			.RegisterDataAccess()
+			.RegisterIdentity()
+			.RegisterUtilities()
+			.RegisterBackgroundServices();
 	}
 }
