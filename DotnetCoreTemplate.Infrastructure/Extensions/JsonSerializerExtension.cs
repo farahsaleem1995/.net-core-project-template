@@ -14,6 +14,11 @@ public static class JsonSerializerExtension
 		return JsonSerializer.Deserialize<T>(json);
 	}
 
+	public static object? Deserialize(this string json, Type returnType)
+	{
+		return JsonSerializer.Deserialize(json, returnType);
+	}
+
 	public static object? Deserialize(this string json)
 	{
 		return json.Deserialize<object>();

@@ -1,11 +1,13 @@
 ﻿using DotnetCoreTemplate.Infrastructure.Identity;
 using DotnetCoreTemplate.Infrastructure.Persistence;
+using DotnetCoreTemplate.WebAPI.CompositionRoot.Factories;
 using DotnetCoreTemplate.WebAPI.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Quartz;
 using SimpleInjector;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -17,10 +19,12 @@ public static class ServiceCollectionIntegrationExtensions
 	public static Container IntegrateWithServiceCollection(
 		this Container container, IServiceCollection services, IConfiguration configuration)
 	{
-		services.AddWebApi();
-		services.AddDataAceess(configuration);
-		services.AddIdentity();
-		services.AddAuthentication(configuration);
+		services.RegisterWebApi();
+		services.RegisterDataAceess(configuration);
+		services.RegisterIdentity();
+		services.RegisterAuthentication(configuration);
+		services.RegisterQuartz(container);
+
 		services.Configure(configuration);
 
 		container.IntegeateServices(services);
@@ -28,7 +32,7 @@ public static class ServiceCollectionIntegrationExtensions
 		return container;
 	}
 
-	private static void AddWebApi(this IServiceCollection services)
+	private static void RegisterWebApi(this IServiceCollection services)
 	{
 		services
 			.AddControllers(options =>
@@ -87,7 +91,7 @@ public static class ServiceCollectionIntegrationExtensions
 		});
 	}
 
-	private static void AddDataAceess(this IServiceCollection services, IConfiguration configuration)
+	private static void RegisterDataAceess(this IServiceCollection services, IConfiguration configuration)
 	{
 		services.AddDbContext<ApplicationDbContext>(options =>
 		{
@@ -99,7 +103,7 @@ public static class ServiceCollectionIntegrationExtensions
 		});
 	}
 
-	private static void AddIdentity(this IServiceCollection services)
+	private static void RegisterIdentity(this IServiceCollection services)
 	{
 		services.AddIdentity<ApplicationUser, ApplicationRole>()
 					.AddEntityFrameworkStores<ApplicationDbContext>()
@@ -124,7 +128,7 @@ public static class ServiceCollectionIntegrationExtensions
 		});
 	}
 
-	private static void AddAuthentication(this IServiceCollection services, IConfiguration configuration)
+	private static void RegisterAuthentication(this IServiceCollection services, IConfiguration configuration)
 	{
 		services
 			.AddAuthentication(options =>
@@ -161,6 +165,16 @@ public static class ServiceCollectionIntegrationExtensions
 					}
 				};
 			});
+	}
+
+	private static void RegisterQuartz(this IServiceCollection services, Container container)
+	{
+		services.AddQuartz(quartz =>
+		{
+			quartz.UseJobFactory<SimpleInjectorJobFactory>();
+		});
+
+		services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 	}
 
 	private static void Configure(this IServiceCollection services, IConfiguration configuration)

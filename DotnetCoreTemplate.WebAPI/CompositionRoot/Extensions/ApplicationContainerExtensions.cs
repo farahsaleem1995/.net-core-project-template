@@ -1,6 +1,7 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Decorators;
 using DotnetCoreTemplate.Application.Shared.Interfaces;
 using DotnetCoreTemplate.Application.Shared.Services;
+using DotnetCoreTemplate.Infrastructure.Interfaces;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Adapters;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Composites;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Services;
@@ -27,6 +28,15 @@ public static class ApplicationContainerExtensions
 		container.Collection.Register(typeof(FluentValidation.IValidator<>), typeof(IRequestHandler<,>).Assembly);
 		container.Register(typeof(IValidator<>), typeof(FluentValidator<>));
 
+		container.RegisterWorkers();
+
 		return container;
+	}
+
+	public static void RegisterWorkers(this Container container)
+	{
+		container.Register(typeof(IWorker<>), typeof(IWorker<>).Assembly);
+
+		container.Register<IWorkExecutor, WorkExecutor>();
 	}
 }

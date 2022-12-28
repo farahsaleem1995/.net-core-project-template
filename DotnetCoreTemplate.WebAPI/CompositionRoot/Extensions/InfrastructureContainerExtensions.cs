@@ -41,6 +41,8 @@ public static class InfrastructureContainerExtensions
 
 		container.Register<IAuditTrailRetriever, EFAuditTrailRetriever>(Lifestyle.Scoped);
 
+		container.Register<IQueueProvider, QuartzQueueProvider>(Lifestyle.Singleton);
+
 		return container;
 	}
 }
