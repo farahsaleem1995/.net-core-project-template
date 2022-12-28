@@ -1,9 +1,11 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
 using DotnetCoreTemplate.Infrastructure.Identity;
+using DotnetCoreTemplate.Infrastructure.Interfaces;
 using DotnetCoreTemplate.Infrastructure.Persistence.Decorator;
 using DotnetCoreTemplate.Infrastructure.Persistence.Interfaces;
 using DotnetCoreTemplate.Infrastructure.Persistence.Services;
 using DotnetCoreTemplate.Infrastructure.Services;
+using DotnetCoreTemplate.WebAPI.CompositionRoot.Services;
 using SimpleInjector;
 
 namespace DotnetCoreTemplate.WebAPI.CompositionRoot.DIConfiguration;
@@ -42,6 +44,8 @@ public static class InfrastructureContainerExtensions
 		container.Register<IAuditTrailRetriever, EFAuditTrailRetriever>(Lifestyle.Scoped);
 
 		container.Register<IQueueProvider, QuartzQueueProvider>(Lifestyle.Singleton);
+
+		container.Register<IWorkExecutor, WorkExecutor>();
 
 		return container;
 	}
