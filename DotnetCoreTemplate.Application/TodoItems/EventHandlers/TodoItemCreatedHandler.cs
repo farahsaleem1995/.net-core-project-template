@@ -8,16 +8,19 @@ public class TodoItemCreatedHandler : IEventHandler<TodoItemCreatedEvent>
 {
 	private readonly ILogger<TodoItemCreatedHandler> _logger;
 	private readonly ITimeProvider _timeProvider;
-	private readonly IScheduleProvider _scheduleProvider;
+	private readonly IWorkScheduler _scheduler;
+	private readonly IWorkQueue _queue;
 
 	public TodoItemCreatedHandler(
 		ILogger<TodoItemCreatedHandler> logger,
 		ITimeProvider timeProvider,
-		IScheduleProvider scheduleProvider)
+		IWorkScheduler scheduler,
+		IWorkQueue queue)
 	{
 		_logger = logger;
 		_timeProvider = timeProvider;
-		_scheduleProvider = scheduleProvider;
+		_scheduler = scheduler;
+		_queue = queue;
 	}
 
 	public async Task Handle(TodoItemCreatedEvent domainEvent, CancellationToken cancellation)
@@ -26,6 +29,8 @@ public class TodoItemCreatedHandler : IEventHandler<TodoItemCreatedEvent>
 
 		var firingTime = _timeProvider.Now.AddSeconds(5);
 
-		await _scheduleProvider.Schedule(new CreateTodoWork(domainEvent.Id), firingTime, cancellation);
+		await _scheduler.Schedule(new CreateTodoWork(domainEvent.Id), firingTime, cancellation);
+
+		await _queue.Enqueue(new CreateTodoWork(domainEvent.Id), cancellation);
 	}
 }

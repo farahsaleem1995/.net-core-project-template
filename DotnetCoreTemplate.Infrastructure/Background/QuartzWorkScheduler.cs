@@ -4,11 +4,11 @@ using Quartz;
 
 namespace DotnetCoreTemplate.Infrastructure.Background;
 
-public class QuartzScheduleProvider : IScheduleProvider
+public class QuartzWorkScheduler : IWorkScheduler
 {
 	private readonly ISchedulerFactory _schedulerFactory;
 
-	public QuartzScheduleProvider(ISchedulerFactory schedulerFactory)
+	public QuartzWorkScheduler(ISchedulerFactory schedulerFactory)
 	{
 		_schedulerFactory = schedulerFactory;
 	}

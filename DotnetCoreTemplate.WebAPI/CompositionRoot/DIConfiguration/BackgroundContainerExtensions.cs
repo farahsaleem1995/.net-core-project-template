@@ -1,5 +1,7 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
 using DotnetCoreTemplate.Infrastructure.Background;
+using DotnetCoreTemplate.WebAPI.CompositionRoot.Adapters;
+using DotnetCoreTemplate.WebAPI.CompositionRoot.Interface;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Services;
 using Quartz;
 using SimpleInjector;
@@ -10,9 +12,13 @@ public static class BackgroundContainerExtensions
 {
 	public static Container RegisterBackgroundServices(this Container container)
 	{
-		container.Register<IScheduleProvider, QuartzScheduleProvider>(Lifestyle.Singleton);
+		container.Register<IWorkScheduler, QuartzWorkScheduler>(Lifestyle.Singleton);
 
-		container.Register<IWorkExecutor, WorkExecutor>();
+		container.Register<IWorkQueue>(() => new AspNetWorkQueue(100), Lifestyle.Singleton);
+
+		container.Register<IWorkHandler, WorkHandler>();
+
+		container.Register<IWorkExecutor, WorkExecutorAdapter>();
 
 		container.Register(typeof(IWorker<>), typeof(IWorker<>).Assembly);
 

@@ -1,6 +1,8 @@
-﻿using DotnetCoreTemplate.Infrastructure.Identity;
+﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
+using DotnetCoreTemplate.Infrastructure.Identity;
 using DotnetCoreTemplate.Infrastructure.Persistence;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Factories;
+using DotnetCoreTemplate.WebAPI.CompositionRoot.Host;
 using DotnetCoreTemplate.WebAPI.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -106,8 +108,8 @@ public static class ServiceCollectionIntegrationExtensions
 	private static void RegisterIdentity(this IServiceCollection services)
 	{
 		services.AddIdentity<ApplicationUser, ApplicationRole>()
-					.AddEntityFrameworkStores<ApplicationDbContext>()
-					.AddDefaultTokenProviders();
+			.AddEntityFrameworkStores<ApplicationDbContext>()
+			.AddDefaultTokenProviders();
 
 		services.Configure<IdentityOptions>(options =>
 		{
@@ -196,6 +198,8 @@ public static class ServiceCollectionIntegrationExtensions
 
 			options.AddLogging();
 			options.AddLocalization();
+
+			options.AddHostedService<QueuedHostedService<IWorkQueue>>();
 		});
 	}
 }
