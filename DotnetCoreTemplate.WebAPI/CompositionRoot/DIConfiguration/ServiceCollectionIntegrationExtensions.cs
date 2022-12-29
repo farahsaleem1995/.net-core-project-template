@@ -1,9 +1,6 @@
 ﻿using DotnetCoreTemplate.Infrastructure.Identity;
 using DotnetCoreTemplate.Infrastructure.Persistence;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Factories;
-using DotnetCoreTemplate.WebAPI.CompositionRoot.Host;
-using DotnetCoreTemplate.WebAPI.CompositionRoot.Interface;
-using DotnetCoreTemplate.WebAPI.CompositionRoot.Services;
 using DotnetCoreTemplate.WebAPI.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -12,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Quartz;
 using SimpleInjector;
+using SimpleInjector.Integration.ServiceCollection;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -19,23 +17,25 @@ namespace DotnetCoreTemplate.WebAPI.CompositionRoot.DIConfiguration;
 
 public static class ServiceCollectionIntegrationExtensions
 {
-	public static Container IntegrateWithServiceCollection(
-		this Container container, IServiceCollection services, IConfiguration configuration)
+	public static Container IntegrateWithServiceCollection(this Container container,
+		IServiceCollection services,
+		IConfiguration configuration,
+		Action<SimpleInjectorAddOptions> setupAction)
 	{
-		services.RegisterWebApi();
-		services.RegisterDataAceess(configuration);
-		services.RegisterIdentity();
-		services.RegisterAuthentication(configuration);
-		services.RegisterQuartz();
+		services.AddWebApi();
+		services.AddDataAceess(configuration);
+		services.AddIdentity();
+		services.AddAuthentication(configuration);
+		services.AddQuartz();
 
 		services.Configure(configuration);
 
-		container.IntegeateServices(services);
+		services.AddSimpleInjector(container, setupAction);
 
 		return container;
 	}
 
-	private static void RegisterWebApi(this IServiceCollection services)
+	private static void AddWebApi(this IServiceCollection services)
 	{
 		services
 			.AddControllers(options =>
@@ -94,7 +94,7 @@ public static class ServiceCollectionIntegrationExtensions
 		});
 	}
 
-	private static void RegisterDataAceess(this IServiceCollection services, IConfiguration configuration)
+	private static void AddDataAceess(this IServiceCollection services, IConfiguration configuration)
 	{
 		services.AddDbContext<ApplicationDbContext>(options =>
 		{
@@ -106,7 +106,7 @@ public static class ServiceCollectionIntegrationExtensions
 		});
 	}
 
-	private static void RegisterIdentity(this IServiceCollection services)
+	private static void AddIdentity(this IServiceCollection services)
 	{
 		services.AddIdentity<ApplicationUser, ApplicationRole>()
 			.AddEntityFrameworkStores<ApplicationDbContext>()
@@ -131,7 +131,7 @@ public static class ServiceCollectionIntegrationExtensions
 		});
 	}
 
-	private static void RegisterAuthentication(this IServiceCollection services, IConfiguration configuration)
+	private static void AddAuthentication(this IServiceCollection services, IConfiguration configuration)
 	{
 		services
 			.AddAuthentication(options =>
@@ -170,7 +170,7 @@ public static class ServiceCollectionIntegrationExtensions
 			});
 	}
 
-	private static void RegisterQuartz(this IServiceCollection services)
+	private static void AddQuartz(this IServiceCollection services)
 	{
 		services.AddQuartz(quartz =>
 		{
@@ -185,22 +185,5 @@ public static class ServiceCollectionIntegrationExtensions
 		services.Configure<TokenConfig>(configuration.GetSection("TokenConfig"));
 
 		services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
-	}
-
-	private static void IntegeateServices(this Container container, IServiceCollection services)
-	{
-		services.AddSimpleInjector(container, options =>
-		{
-			options.AddAspNetCore()
-				.AddControllerActivation()
-				.AddViewComponentActivation()
-				.AddPageModelActivation()
-				.AddTagHelperActivation();
-
-			options.AddLogging();
-			options.AddLocalization();
-
-			options.AddHostedService<InifinteLoopHostedService<WorkQueueProcessor>>();
-		});
 	}
 }
