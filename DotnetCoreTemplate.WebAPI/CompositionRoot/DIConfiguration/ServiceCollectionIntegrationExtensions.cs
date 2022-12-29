@@ -1,8 +1,9 @@
-﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
-using DotnetCoreTemplate.Infrastructure.Identity;
+﻿using DotnetCoreTemplate.Infrastructure.Identity;
 using DotnetCoreTemplate.Infrastructure.Persistence;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Factories;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Host;
+using DotnetCoreTemplate.WebAPI.CompositionRoot.Interface;
+using DotnetCoreTemplate.WebAPI.CompositionRoot.Services;
 using DotnetCoreTemplate.WebAPI.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -25,7 +26,7 @@ public static class ServiceCollectionIntegrationExtensions
 		services.RegisterDataAceess(configuration);
 		services.RegisterIdentity();
 		services.RegisterAuthentication(configuration);
-		services.RegisterQuartz(container);
+		services.RegisterQuartz();
 
 		services.Configure(configuration);
 
@@ -169,7 +170,7 @@ public static class ServiceCollectionIntegrationExtensions
 			});
 	}
 
-	private static void RegisterQuartz(this IServiceCollection services, Container container)
+	private static void RegisterQuartz(this IServiceCollection services)
 	{
 		services.AddQuartz(quartz =>
 		{
@@ -199,7 +200,7 @@ public static class ServiceCollectionIntegrationExtensions
 			options.AddLogging();
 			options.AddLocalization();
 
-			options.AddHostedService<QueuedHostedService<IWorkQueue>>();
+			options.AddHostedService<InifinteLoopHostedService<WorkQueueProcessor>>();
 		});
 	}
 }

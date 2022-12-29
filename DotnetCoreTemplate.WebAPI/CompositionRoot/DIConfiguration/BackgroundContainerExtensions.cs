@@ -1,6 +1,7 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
 using DotnetCoreTemplate.Infrastructure.Background;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Adapters;
+using DotnetCoreTemplate.WebAPI.CompositionRoot.Host;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Interface;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Services;
 using Quartz;
@@ -12,6 +13,17 @@ public static class BackgroundContainerExtensions
 {
 	public static Container RegisterBackgroundServices(this Container container)
 	{
+		container.RegisterWorkers();
+
+		container.RegisterHostedServices();
+
+		container.RegisterQuartzJob();
+
+		return container;
+	}
+
+	private static void RegisterWorkers(this Container container)
+	{
 		container.Register<IWorkScheduler, QuartzWorkScheduler>(Lifestyle.Singleton);
 
 		container.Register<IWorkQueue>(() => new AspNetWorkQueue(100), Lifestyle.Singleton);
@@ -21,10 +33,6 @@ public static class BackgroundContainerExtensions
 		container.Register<IWorkExecutor, WorkExecutorAdapter>();
 
 		container.Register(typeof(IWorker<>), typeof(IWorker<>).Assembly);
-
-		container.RegisterQuartzJob();
-
-		return container;
 	}
 
 	private static void RegisterQuartzJob(this Container container)
@@ -41,5 +49,12 @@ public static class BackgroundContainerExtensions
 		{
 			container.Register(type);
 		};
+	}
+
+	private static void RegisterHostedServices(this Container container)
+	{
+		container.RegisterInstance(
+			new InifinteLoopHostedService<WorkQueueProcessor>
+				.InfiniteLoopHostSettings(typeof(IHostProcessor).Assembly));
 	}
 }
