@@ -2,5 +2,6 @@
 
 public interface IWorkScheduler
 {
-	Task Schedule<TWork>(TWork work, DateTime firingTime, CancellationToken cancellation = default);
+	Task Schedule<TWork>(TWork work, DateTime firingTime, CancellationToken cancellation = default)
+		 where TWork : IWork;
 }

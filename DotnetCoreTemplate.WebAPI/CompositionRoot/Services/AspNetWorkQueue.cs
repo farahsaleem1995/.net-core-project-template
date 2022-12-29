@@ -19,6 +19,7 @@ public class AspNetWorkQueue : IWorkQueue
 	}
 
 	public async Task Enqueue<TWork>(TWork work, CancellationToken cancellation = default)
+		 where TWork : IWork
 	{
 		if (work == null)
 		{

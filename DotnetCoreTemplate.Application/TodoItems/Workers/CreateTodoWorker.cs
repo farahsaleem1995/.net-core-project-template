@@ -2,7 +2,7 @@
 
 namespace DotnetCoreTemplate.Application.TodoItems.Workers;
 
-public record CreateTodoWork(int Id);
+public record CreateTodoWork(int Id) : IWork;
 
 public class CreateTodoWorker : IWorker<CreateTodoWork>
 {

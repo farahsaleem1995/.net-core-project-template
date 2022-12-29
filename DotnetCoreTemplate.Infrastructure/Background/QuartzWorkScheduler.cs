@@ -14,6 +14,7 @@ public class QuartzWorkScheduler : IWorkScheduler
 	}
 
 	public async Task Schedule<TWork>(TWork work, DateTime firingTime, CancellationToken cancellation = default)
+		 where TWork : IWork
 	{
 		if (work == null)
 		{
