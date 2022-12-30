@@ -2,15 +2,15 @@
 using DotnetCoreTemplate.Application.Shared.Models;
 using System.Threading.Channels;
 
-namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Services;
+namespace DotnetCoreTemplate.Infrastructure.Background;
 
-public class AspNetWorkQueue : IWorkQueue
+public class DefaultWorkQueue : IWorkQueue
 {
 	private readonly Channel<QueuedWork> _queue;
 
-	public AspNetWorkQueue(int capacity)
+	public DefaultWorkQueue(QueueSettings settings)
 	{
-		var options = new BoundedChannelOptions(capacity)
+		var options = new BoundedChannelOptions(settings.Cpacity)
 		{
 			FullMode = BoundedChannelFullMode.Wait
 		};
@@ -32,5 +32,15 @@ public class AspNetWorkQueue : IWorkQueue
 	public async Task<QueuedWork> Dequeue(CancellationToken cancellation = default)
 	{
 		return await _queue.Reader.ReadAsync(cancellation);
+	}
+
+	public class QueueSettings
+	{
+		public QueueSettings(int cpacity)
+		{
+			Cpacity = cpacity;
+		}
+
+		public int Cpacity { get; }
 	}
 }
