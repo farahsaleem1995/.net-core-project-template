@@ -1,7 +1,6 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
 using DotnetCoreTemplate.Infrastructure.Background;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Host;
-using DotnetCoreTemplate.WebAPI.CompositionRoot.Interface;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Services;
 using Quartz;
 using SimpleInjector;
@@ -56,7 +55,7 @@ public static class BackgroundContainerExtensions
 	private static void RegisterHostedServices(this Container container)
 	{
 		container.RegisterInstance(
-			new InifinteLoopHostedService<WorkQueueProcessor>
-				.InfiniteLoopHostSettings(typeof(IHostProcessor).Assembly));
+			new ScopedLoopHostedService<WorkQueueProcessor>
+				.ScopedLoopHostSettings(typeof(IHostProcessor).Assembly));
 	}
 }

@@ -43,6 +43,6 @@ public class SimpleInjectorServiceConfigurator
 		options.AddLogging();
 		options.AddLocalization();
 
-		options.AddHostedService<InifinteLoopHostedService<WorkQueueProcessor>>();
+		options.AddHostedService<ScopedLoopHostedService<WorkQueueProcessor>>();
 	}
 }

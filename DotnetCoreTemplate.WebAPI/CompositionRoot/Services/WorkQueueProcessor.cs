@@ -1,5 +1,5 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
-using DotnetCoreTemplate.WebAPI.CompositionRoot.Interface;
+using DotnetCoreTemplate.WebAPI.CompositionRoot.Host;
 
 namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Services;
 

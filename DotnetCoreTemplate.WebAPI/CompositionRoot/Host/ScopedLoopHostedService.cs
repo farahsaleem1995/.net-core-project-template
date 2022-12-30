@@ -1,19 +1,18 @@
-﻿using DotnetCoreTemplate.WebAPI.CompositionRoot.Interface;
-using SimpleInjector;
+﻿using SimpleInjector;
 using SimpleInjector.Lifestyles;
 using System.Reflection;
 
 namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Host;
 
-public class InifinteLoopHostedService<TProcessor> : BackgroundService
+public class ScopedLoopHostedService<TProcessor> : BackgroundService
 	where TProcessor : class, IHostProcessor
 {
 	private readonly Container _container;
 	private readonly Dictionary<Type, InstanceProducer> _processorProducers;
 
-	public InifinteLoopHostedService(
+	public ScopedLoopHostedService(
 		Container container,
-		InfiniteLoopHostSettings settings)
+		ScopedLoopHostSettings settings)
 	{
 		_container = container;
 
@@ -55,9 +54,9 @@ public class InifinteLoopHostedService<TProcessor> : BackgroundService
 		}
 	}
 
-	public class InfiniteLoopHostSettings
+	public class ScopedLoopHostSettings
 	{
-		public InfiniteLoopHostSettings(params Assembly[] assemblies)
+		public ScopedLoopHostSettings(params Assembly[] assemblies)
 		{
 			Assemblies = assemblies;
 		}

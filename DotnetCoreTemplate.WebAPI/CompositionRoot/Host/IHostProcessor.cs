@@ -1,4 +1,4 @@
-﻿namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Interface;
+﻿namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Host;
 
 public interface IHostProcessor
 {
