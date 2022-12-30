@@ -1,6 +1,6 @@
 ﻿namespace DotnetCoreTemplate.Domain.Shared;
 
-public class DomainEvent
+public abstract class DomainEvent
 {
 	public bool IsDispatched { get; set; }
 }

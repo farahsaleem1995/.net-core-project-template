@@ -36,8 +36,6 @@ public static class DomainContainerExtensions
 
 	private static Container RegisterEventHandlers(this Container container)
 	{
-		container.Register<IEventDispatcher, EventDispatcher>();
-
 		container.Collection.Register(typeof(IEventHandler<>), typeof(IEventHandler<>).Assembly);
 		container.Register(typeof(IEventHandler<>), typeof(CompositeEventHandler<>));
 

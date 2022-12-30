@@ -27,8 +27,6 @@ public static class BackgroundContainerExtensions
 	{
 		container.Register<IWorkScheduler, QuartzWorkScheduler>(Lifestyle.Singleton);
 
-		container.Register<IWorkerInvoker, WorkerInvoker>();
-
 		container.Register(typeof(IWorker<>), typeof(IWorker<>).Assembly);
 	}
 

@@ -20,7 +20,7 @@ public class TodosController : ApiControllerBase
 	public async Task<IActionResult> Create([FromQuery] GetTodoItemsQuery query,
 		CancellationToken cancellation)
 	{
-		var todoItems = await Director.Send(query, cancellation);
+		var todoItems = await Director.SendRequest(query, cancellation);
 
 		return Ok(todoItems);
 	}
@@ -28,7 +28,7 @@ public class TodosController : ApiControllerBase
 	[HttpGet("{id}")]
 	public async Task<IActionResult> Create([FromRoute] int id, CancellationToken cancellation)
 	{
-		var todoItems = await Director.Send(new GetTodoItemByIdQuery(id), cancellation);
+		var todoItems = await Director.SendRequest(new GetTodoItemByIdQuery(id), cancellation);
 
 		return Ok(todoItems);
 	}
@@ -37,7 +37,7 @@ public class TodosController : ApiControllerBase
 	public async Task<IActionResult> Create([FromBody] CreateTodoItemCommand command,
 		CancellationToken cancellation)
 	{
-		var id = await Director.Send(command, cancellation);
+		var id = await Director.SendRequest(command, cancellation);
 
 		return Ok(id);
 	}
@@ -46,7 +46,7 @@ public class TodosController : ApiControllerBase
 	public async Task<IActionResult> Update([FromBody] UpdateTodoItemCommand command,
 		CancellationToken cancellation)
 	{
-		await Director.Send(command, cancellation);
+		await Director.SendRequest(command, cancellation);
 
 		return NoContent();
 	}
@@ -55,7 +55,7 @@ public class TodosController : ApiControllerBase
 	public async Task<IActionResult> SetAsToDo([FromBody] SetTodoItemAsToDoCommand command,
 		CancellationToken cancellation)
 	{
-		await Director.Send(command, cancellation);
+		await Director.SendRequest(command, cancellation);
 
 		return NoContent();
 	}
@@ -64,7 +64,7 @@ public class TodosController : ApiControllerBase
 	public async Task<IActionResult> SetAsDoing([FromBody] SetTodoItemAsDoingCommand command,
 		CancellationToken cancellation)
 	{
-		await Director.Send(command, cancellation);
+		await Director.SendRequest(command, cancellation);
 
 		return NoContent();
 	}
@@ -73,7 +73,7 @@ public class TodosController : ApiControllerBase
 	public async Task<IActionResult> SetAsDone([FromBody] SetTodoItemAsDoneCommand command,
 		CancellationToken cancellation)
 	{
-		await Director.Send(command, cancellation);
+		await Director.SendRequest(command, cancellation);
 
 		return NoContent();
 	}

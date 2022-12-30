@@ -7,16 +7,16 @@ namespace DotnetCoreTemplate.Application.TodoItems.Commands.CreateTodoItem;
 public class CreateTodoItemHandler : IRequestHandler<CreateTodoItemCommand, int>
 {
 	private readonly IUnitOfWork _unitOfWork;
-	private readonly IEventDispatcher _dispatcher;
+	private readonly IDirector _director;
 	private readonly IRepository<TodoItem> _todoItemsRepository;
 
 	public CreateTodoItemHandler(
 		IUnitOfWork unitOfWork,
-		IEventDispatcher dispatcher,
+		IDirector director,
 		IRepository<TodoItem> todoItemsRepository)
 	{
 		_unitOfWork = unitOfWork;
-		_dispatcher = dispatcher;
+		_director = director;
 		_todoItemsRepository = todoItemsRepository;
 	}
 
@@ -28,7 +28,7 @@ public class CreateTodoItemHandler : IRequestHandler<CreateTodoItemCommand, int>
 
 		await _unitOfWork.SaveAsync(cancellation);
 
-		await _dispatcher.Dispatch(new TodoItemCreatedEvent(todoItem.Id), cancellation);
+		await _director.DispatchEvent(new TodoItemCreatedEvent(todoItem.Id), cancellation);
 
 		return todoItem.Id;
 	}

@@ -15,7 +15,7 @@ public class AuditTrailController : ApiControllerBase
 	public async Task<IActionResult> Get(
 		[FromQuery] GetAuditTrailQuery query, CancellationToken cancellation)
 	{
-		var tail = await Director.Send(query, cancellation);
+		var tail = await Director.SendRequest(query, cancellation);
 
 		return Ok(tail);
 	}

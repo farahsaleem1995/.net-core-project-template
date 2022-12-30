@@ -2,12 +2,12 @@
 
 namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Helpers;
 
-public static class MethodCallHelper
+public static class MethodInvokeHelper
 {
 	private static readonly MethodInfo _callMethodInfo =
-		typeof(MethodCallHelper).GetTypeInfo().GetDeclaredMethod(nameof(CallMethod))!;
+		typeof(MethodInvokeHelper).GetTypeInfo().GetDeclaredMethod(nameof(CallMethod))!;
 
-	public static TCallDelegate MakeFastCaller<TCallDelegate>(Type declaringType, string methodName)
+	public static TCallDelegate MakeFastInvoker<TCallDelegate>(Type declaringType, string methodName)
 		where TCallDelegate : Delegate
 	{
 		var methodInfo = declaringType.GetMethod(methodName)!;

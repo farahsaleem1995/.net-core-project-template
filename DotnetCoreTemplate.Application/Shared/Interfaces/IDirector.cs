@@ -1,6 +1,12 @@
-﻿namespace DotnetCoreTemplate.Application.Shared.Interfaces;
+﻿using DotnetCoreTemplate.Domain.Shared;
+
+namespace DotnetCoreTemplate.Application.Shared.Interfaces;
 
 public interface IDirector
 {
-	Task<TResult> Send<TResult>(IRequest<TResult> request, CancellationToken cancellation);
+	Task<TResult> SendRequest<TResult>(IRequest<TResult> request, CancellationToken cancellation);
+
+	Task DispatchEvent(DomainEvent domainEvent, CancellationToken cancellation);
+
+	Task ExecuteWork(IWork work, CancellationToken cancellation);
 }

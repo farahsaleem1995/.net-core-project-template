@@ -17,7 +17,7 @@ public class AuthController : ApiControllerBase
 	public async Task<IActionResult> RegisterAccount(
 		[FromBody] RegisterUserCommand command, CancellationToken cancellation)
 	{
-		await Director.Send(command, cancellation);
+		await Director.SendRequest(command, cancellation);
 
 		return NoContent();
 	}
@@ -26,7 +26,7 @@ public class AuthController : ApiControllerBase
 	public async Task<IActionResult> SignIn(
 		[FromBody] SignInCommand command, CancellationToken cancellation)
 	{
-		var token = await Director.Send(command, cancellation);
+		var token = await Director.SendRequest(command, cancellation);
 
 		return Ok(token);
 	}
@@ -34,7 +34,7 @@ public class AuthController : ApiControllerBase
 	[HttpPost("sign-out")]
 	public async Task<IActionResult> SignOut(CancellationToken cancellation)
 	{
-		await Director.Send(new SignOutCommand(), cancellation);
+		await Director.SendRequest(new SignOutCommand(), cancellation);
 
 		return NoContent();
 	}
@@ -43,7 +43,7 @@ public class AuthController : ApiControllerBase
 	public async Task<IActionResult> RefreshToken(
 		[FromBody] RefreshTokenCommand command, CancellationToken cancellation)
 	{
-		var token = await Director.Send(command, cancellation);
+		var token = await Director.SendRequest(command, cancellation);
 
 		return Ok(token);
 	}
