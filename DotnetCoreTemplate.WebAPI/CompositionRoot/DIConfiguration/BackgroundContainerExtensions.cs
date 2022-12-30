@@ -28,9 +28,7 @@ public static class BackgroundContainerExtensions
 
 		container.Register<IWorkQueue>(() => new AspNetWorkQueue(100), Lifestyle.Singleton);
 
-		container.Register<IWorkHandler, WorkHandler>();
-
-		container.Register<IWorkExecutor, WorkExecutorAdapter>();
+		container.Register<IWorkerInvoker, WorkerInvoker>();
 
 		container.Register(typeof(IWorker<>), typeof(IWorker<>).Assembly);
 	}

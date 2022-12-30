@@ -6,20 +6,18 @@ namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Services;
 public class WorkQueueProcessor : IHostProcessor
 {
 	private readonly IWorkQueue _queue;
-	private readonly IWorkHandler _handler;
+	private readonly IWorkerInvoker _workerInvoker;
 
-	public WorkQueueProcessor(
-		IWorkQueue queue,
-		IWorkHandler handler)
+	public WorkQueueProcessor(IWorkQueue queue, IWorkerInvoker workerInvoker)
 	{
 		_queue = queue;
-		_handler = handler;
+		_workerInvoker = workerInvoker;
 	}
 
 	public async Task ProcessAsync(CancellationToken cancellation)
 	{
 		var queuedWork = await _queue.Dequeue(cancellation);
 
-		await _handler.HandleWork(queuedWork.WorkType, queuedWork.WorkInstance, cancellation);
+		await _workerInvoker.Invoke(queuedWork.WorkType, queuedWork.WorkInstance, cancellation);
 	}
 }

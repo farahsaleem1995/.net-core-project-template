@@ -1,15 +1,16 @@
-﻿using DotnetCoreTemplate.Infrastructure.Extensions;
+﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
+using DotnetCoreTemplate.Infrastructure.Extensions;
 using Quartz;
 
 namespace DotnetCoreTemplate.Infrastructure.Background;
 
-public class QuartzJob<TWork> : IJob
+public class QuartzJob<TWork> : IJob where TWork : IWork
 {
-	private readonly IWorkExecutor _executor;
+	private readonly IWorker<TWork> _worker;
 
-	public QuartzJob(IWorkExecutor executor)
+	public QuartzJob(IWorker<TWork> worker)
 	{
-		_executor = executor;
+		_worker = worker;
 	}
 
 	public async Task Execute(IJobExecutionContext context)
@@ -20,7 +21,7 @@ public class QuartzJob<TWork> : IJob
 			return;
 		}
 
-		await _executor.Execute(work, context.CancellationToken);
+		await _worker.Execute(work, context.CancellationToken);
 	}
 
 	private static TWork? GetWork(IJobExecutionContext context)

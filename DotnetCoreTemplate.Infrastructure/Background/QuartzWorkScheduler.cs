@@ -25,6 +25,7 @@ public class QuartzWorkScheduler : IWorkScheduler
 	}
 
 	private async Task SchedulrJob<TWork>(TWork work, DateTime firingTime, CancellationToken cancellation)
+		where TWork : IWork
 	{
 		var scheduler = await _schedulerFactory.GetScheduler(cancellation);
 
@@ -47,6 +48,7 @@ public class QuartzWorkScheduler : IWorkScheduler
 	}
 
 	private static IJobDetail BuildJob<TWork>(string name, string group, JobDataMap dataMap)
+		where TWork : IWork
 	{
 		return JobBuilder.Create<QuartzJob<TWork>>()
 			.WithIdentity(name, group)
