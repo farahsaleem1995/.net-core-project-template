@@ -3,7 +3,6 @@ using DotnetCoreTemplate.Application.Shared.Models;
 using DotnetCoreTemplate.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -16,18 +15,18 @@ public class TokenProvider : ITokenProvider
 	private readonly UserManager<ApplicationUser> _userManager;
 	private readonly ApplicationDbContext _dbContext;
 	private readonly ITimeProvider _timeProvider;
-	private readonly TokenConfig _tokenConfig;
+	private readonly TokenSettings _settings;
 
 	public TokenProvider(
 		UserManager<ApplicationUser> userManager,
 		ApplicationDbContext dbContext,
 		ITimeProvider timeProvider,
-		IOptions<TokenConfig> options)
+		TokenSettings settings)
 	{
 		_userManager = userManager;
 		_dbContext = dbContext;
 		_timeProvider = timeProvider;
-		_tokenConfig = options.Value;
+		_settings = settings;
 	}
 
 	public async Task<Result<Token>> GenerateTokenAsync(string userId, CancellationToken cancellation = default)
@@ -84,9 +83,9 @@ public class TokenProvider : ITokenProvider
 	private string GenerateAccessToken(List<Claim> claims)
 	{
 		var tokenHandler = new JwtSecurityTokenHandler();
-		var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenConfig.Key));
+		var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Key));
 		var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-		var expiredDate = _timeProvider.Now.Add(_tokenConfig.AccessLifetime);
+		var expiredDate = _timeProvider.Now.Add(_settings.AccessLifetime);
 
 		var descriptor = new SecurityTokenDescriptor
 		{
@@ -103,7 +102,7 @@ public class TokenProvider : ITokenProvider
 	private async Task<string> CreateRefreshToken(ApplicationUser user, string jti, CancellationToken cancellation)
 	{
 		var token = Guid.NewGuid().ToString();
-		var expiredDate = _timeProvider.Now.Add(_tokenConfig.RefreshLifetime);
+		var expiredDate = _timeProvider.Now.Add(_settings.RefreshLifetime);
 		var refreshToken = new RefreshToken(jti, token, user.Id, expiredDate);
 
 		await _dbContext.RefreshTokens.AddAsync(refreshToken, cancellation);
@@ -163,11 +162,11 @@ public class TokenProvider : ITokenProvider
 		{
 			ValidateLifetime = validateLifetime,
 			ValidateIssuerSigningKey = true,
-			ValidateIssuer = _tokenConfig.ValidateIssuer,
-			ValidateAudience = _tokenConfig.ValidateAudience,
-			ValidIssuer = _tokenConfig.Issuer,
-			ValidAudience = _tokenConfig.Audience,
-			IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenConfig.Key)),
+			ValidateIssuer = _settings.ValidateIssuer,
+			ValidateAudience = _settings.ValidateAudience,
+			ValidIssuer = _settings.Issuer,
+			ValidAudience = _settings.Audience,
+			IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Key)),
 		};
 	}
 
@@ -231,5 +230,22 @@ public class TokenProvider : ITokenProvider
 				c => c.SetProperty(t => t.Invalidated, t => true), cancellation);
 
 		return Result.Succeed();
+	}
+
+	public class TokenSettings
+	{
+		public string Key { get; init; } = string.Empty;
+
+		public TimeSpan AccessLifetime { get; init; }
+
+		public TimeSpan RefreshLifetime { get; init; }
+
+		public string Issuer { get; init; } = string.Empty;
+
+		public bool ValidateIssuer { get; init; }
+
+		public string Audience { get; init; } = string.Empty;
+
+		public bool ValidateAudience { get; init; }
 	}
 }

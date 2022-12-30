@@ -27,7 +27,7 @@ public class SimpleInjectorServiceConfigurator
 		_container.IntegrateWithServiceCollection(_services, _configuration, SetupSimpleInjector)
 			.RegisterDomainServices()
 			.RegisterDataAccess()
-			.RegisterIdentity()
+			.RegisterIdentity(_configuration)
 			.RegisterUtilities()
 			.RegisterBackgroundServices();
 	}

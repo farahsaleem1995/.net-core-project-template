@@ -142,17 +142,20 @@ public static class ServiceCollectionIntegrationExtensions
 			})
 			.AddJwtBearer(options =>
 			{
+				var tokenSettings = new TokenProvider.TokenSettings();
+				configuration.GetSection("TokenSettings").Bind(tokenSettings);
+
 				options.SaveToken = true;
 				options.RequireHttpsMetadata = false;
 				options.TokenValidationParameters = new()
 				{
 					ValidateLifetime = true,
 					ValidateIssuerSigningKey = true,
-					ValidIssuer = configuration["TokenConfig:Issuer"],
-					ValidateIssuer = configuration.GetValue<bool>("TokenConfig:ValidateIssuer"),
-					ValidAudience = configuration["TokenConfig:Audience"],
-					ValidateAudience = configuration.GetValue<bool>("TokenConfig:ValidateAudience"),
-					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["TokenConfig:Key"]!)),
+					ValidIssuer = tokenSettings.Issuer,
+					ValidateIssuer = tokenSettings.ValidateIssuer,
+					ValidAudience = tokenSettings.Audience,
+					ValidateAudience = tokenSettings.ValidateAudience,
+					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenSettings.Key)),
 				};
 				options.Events = new JwtBearerEvents
 				{
@@ -182,8 +185,6 @@ public static class ServiceCollectionIntegrationExtensions
 
 	private static void Configure(this IServiceCollection services, IConfiguration configuration)
 	{
-		services.Configure<TokenConfig>(configuration.GetSection("TokenConfig"));
-
 		services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 	}
 }
