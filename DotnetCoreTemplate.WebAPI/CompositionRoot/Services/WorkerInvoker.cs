@@ -20,17 +20,14 @@ public class WorkerInvoker : IWorkerInvoker
 		_workExecutors = workExecutors;
 	}
 
-	public async Task Invoke(Type workType, object work, CancellationToken cancellation)
+	public async Task Invoke(IWork work, CancellationToken cancellation)
 	{
-		if (workType == null)
-		{
-			throw new ArgumentNullException(nameof(workType));
-		}
-
 		if (work == null)
 		{
 			throw new ArgumentNullException(nameof(work));
 		}
+
+		var workType = work.GetType();
 
 		await ExecuteWork(workType, work, cancellation);
 	}

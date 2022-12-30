@@ -4,8 +4,7 @@ namespace DotnetCoreTemplate.Application.Shared.Interfaces;
 
 public interface IWorkQueue
 {
-	Task Enqueue<TWork>(TWork work, CancellationToken cancellation = default)
-		where TWork : IWork;
+	Task Enqueue(IWork work, CancellationToken cancellation = default);
 
-	Task<QueuedWork> Dequeue(CancellationToken cancellation = default);
+	Task<IWork> Dequeue(CancellationToken cancellation = default);
 }

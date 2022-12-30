@@ -1,6 +1,8 @@
-﻿namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Interface;
+﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
+
+namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Interface;
 
 public interface IWorkerInvoker
 {
-	Task Invoke(Type workType, object work, CancellationToken cancellation);
+	Task Invoke(IWork work, CancellationToken cancellation);
 }

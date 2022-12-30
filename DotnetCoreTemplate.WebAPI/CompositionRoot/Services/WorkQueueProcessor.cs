@@ -16,8 +16,8 @@ public class WorkQueueProcessor : IHostProcessor
 
 	public async Task ProcessAsync(CancellationToken cancellation)
 	{
-		var queuedWork = await _queue.Dequeue(cancellation);
+		var work = await _queue.Dequeue(cancellation);
 
-		await _workerInvoker.Invoke(queuedWork.WorkType, queuedWork.WorkInstance, cancellation);
+		await _workerInvoker.Invoke(work, cancellation);
 	}
 }

@@ -6,7 +6,7 @@ namespace DotnetCoreTemplate.Infrastructure.Background;
 
 public class DefaultWorkQueue : IWorkQueue
 {
-	private readonly Channel<QueuedWork> _queue;
+	private readonly Channel<IWork> _queue;
 
 	public DefaultWorkQueue(QueueSettings settings)
 	{
@@ -15,21 +15,20 @@ public class DefaultWorkQueue : IWorkQueue
 			FullMode = BoundedChannelFullMode.Wait
 		};
 
-		_queue = Channel.CreateBounded<QueuedWork>(options);
+		_queue = Channel.CreateBounded<IWork>(options);
 	}
 
-	public async Task Enqueue<TWork>(TWork work, CancellationToken cancellation = default)
-		 where TWork : IWork
+	public async Task Enqueue(IWork work, CancellationToken cancellation = default)
 	{
 		if (work == null)
 		{
 			throw new ArgumentNullException(nameof(work));
 		}
 
-		await _queue.Writer.WriteAsync(new QueuedWork(work), cancellation);
+		await _queue.Writer.WriteAsync(work, cancellation);
 	}
 
-	public async Task<QueuedWork> Dequeue(CancellationToken cancellation = default)
+	public async Task<IWork> Dequeue(CancellationToken cancellation = default)
 	{
 		return await _queue.Reader.ReadAsync(cancellation);
 	}
