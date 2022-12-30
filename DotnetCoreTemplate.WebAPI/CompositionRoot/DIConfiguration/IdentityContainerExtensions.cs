@@ -24,7 +24,7 @@ public static class IdentityContainerExtensions
 
 	private static Container RegisterTokenSettings(this Container container, IConfiguration configuration)
 	{
-		var settings = new TokenProvider.TokenSettings();
+		var settings = new TokenProvider.Settings();
 
 		configuration.GetSection("TokenSettings").Bind(settings);
 

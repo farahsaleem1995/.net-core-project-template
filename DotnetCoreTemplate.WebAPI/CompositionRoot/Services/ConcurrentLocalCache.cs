@@ -1,7 +1,7 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
 using System.Collections.Concurrent;
 
-namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Utils;
+namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Services;
 
 public class ConcurrentLocalCache<TKey, TValue> : ILocalCache<TKey, TValue>
 	where TKey : notnull

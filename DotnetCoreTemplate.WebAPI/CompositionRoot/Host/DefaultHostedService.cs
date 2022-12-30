@@ -4,34 +4,31 @@ using System.Reflection;
 
 namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Host;
 
-public class ScopedLoopHostedService<TProcessor> : BackgroundService
-	where TProcessor : class, IHostProcessor
+public class DefaultHostedService<TProcessor> : BackgroundService
+	where TProcessor : class, IProcessor
 {
 	private readonly Container _container;
 	private readonly Dictionary<Type, InstanceProducer> _processorProducers;
 
-	public ScopedLoopHostedService(
-		Container container,
-		ScopedLoopHostSettings settings)
+	public DefaultHostedService(Container container, Settings settings)
 	{
 		_container = container;
 
-		_processorProducers = _container.GetTypesToRegister(typeof(IHostProcessor), settings.Assemblies)
+		_processorProducers = _container.GetTypesToRegister(typeof(IProcessor), settings.Assemblies)
 			.ToDictionary(type => type,
-				type => Lifestyle.Transient.CreateProducer(typeof(IHostProcessor), type, container));
+				type => Lifestyle.Transient.CreateProducer(typeof(IProcessor), type, container));
 	}
 
 	protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 	{
-		// Verify that TService can be resolved
 		var producer = _processorProducers[typeof(TProcessor)];
 
-		var processor = (IHostProcessor)producer.GetInstance();
+		var processor = (IProcessor)producer.GetInstance();
 
 		await DoWork(processor, stoppingToken);
 	}
 
-	private async Task DoWork(IHostProcessor processor, CancellationToken stoppingToken)
+	private async Task DoWork(IProcessor processor, CancellationToken stoppingToken)
 	{
 		try
 		{
@@ -43,7 +40,7 @@ public class ScopedLoopHostedService<TProcessor> : BackgroundService
 		}
 	}
 
-	private async Task TryDoWork(IHostProcessor processor, CancellationToken stoppingToken)
+	private async Task TryDoWork(IProcessor processor, CancellationToken stoppingToken)
 	{
 		while (true)
 		{
@@ -54,9 +51,9 @@ public class ScopedLoopHostedService<TProcessor> : BackgroundService
 		}
 	}
 
-	public class ScopedLoopHostSettings
+	public class Settings
 	{
-		public ScopedLoopHostSettings(params Assembly[] assemblies)
+		public Settings(params Assembly[] assemblies)
 		{
 			Assemblies = assemblies;
 		}

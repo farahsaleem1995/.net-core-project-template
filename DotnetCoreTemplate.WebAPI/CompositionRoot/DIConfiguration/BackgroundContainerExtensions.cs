@@ -55,7 +55,6 @@ public static class BackgroundContainerExtensions
 	private static void RegisterHostedServices(this Container container)
 	{
 		container.RegisterInstance(
-			new ScopedLoopHostedService<WorkQueueProcessor>
-				.ScopedLoopHostSettings(typeof(IHostProcessor).Assembly));
+			new DefaultHostedService<WorkQueueProcessor>.Settings(typeof(IProcessor).Assembly));
 	}
 }

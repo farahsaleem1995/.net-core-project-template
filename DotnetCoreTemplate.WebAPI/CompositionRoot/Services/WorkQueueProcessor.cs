@@ -3,7 +3,7 @@ using DotnetCoreTemplate.WebAPI.CompositionRoot.Host;
 
 namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Services;
 
-public class WorkQueueProcessor : IHostProcessor
+public class WorkQueueProcessor : IProcessor
 {
 	private readonly IWorkQueue _queue;
 	private readonly IDirector _director;

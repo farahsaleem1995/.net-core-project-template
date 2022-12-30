@@ -15,13 +15,13 @@ public class TokenProvider : ITokenProvider
 	private readonly UserManager<ApplicationUser> _userManager;
 	private readonly ApplicationDbContext _dbContext;
 	private readonly ITimeProvider _timeProvider;
-	private readonly TokenSettings _settings;
+	private readonly Settings _settings;
 
 	public TokenProvider(
 		UserManager<ApplicationUser> userManager,
 		ApplicationDbContext dbContext,
 		ITimeProvider timeProvider,
-		TokenSettings settings)
+		Settings settings)
 	{
 		_userManager = userManager;
 		_dbContext = dbContext;
@@ -232,7 +232,7 @@ public class TokenProvider : ITokenProvider
 		return Result.Succeed();
 	}
 
-	public class TokenSettings
+	public class Settings
 	{
 		public string Key { get; init; } = string.Empty;
 

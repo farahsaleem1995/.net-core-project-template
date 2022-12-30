@@ -142,7 +142,7 @@ public static class ServiceCollectionIntegrationExtensions
 			})
 			.AddJwtBearer(options =>
 			{
-				var tokenSettings = new TokenProvider.TokenSettings();
+				var tokenSettings = new TokenProvider.Settings();
 				configuration.GetSection("TokenSettings").Bind(tokenSettings);
 
 				options.SaveToken = true;

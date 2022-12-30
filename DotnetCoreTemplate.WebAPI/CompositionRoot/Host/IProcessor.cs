@@ -1,6 +1,6 @@
 ﻿namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Host;
 
-public interface IHostProcessor
+public interface IProcessor
 {
 	Task ProcessAsync(CancellationToken cancellation);
 }
