@@ -17,18 +17,7 @@ public static class IdentityContainerExtensions
 
 		container.Register<ITokenProvider, TokenProvider>(Lifestyle.Scoped);
 
-		container.RegisterTokenSettings(configuration);
-
-		return container;
-	}
-
-	private static Container RegisterTokenSettings(this Container container, IConfiguration configuration)
-	{
-		var settings = new TokenProvider.Settings();
-
-		configuration.GetSection("TokenSettings").Bind(settings);
-
-		container.RegisterInstance(settings);
+		container.RegisterSettings<TokenProvider.Settings>(configuration, "TokenSettings");
 
 		return container;
 	}

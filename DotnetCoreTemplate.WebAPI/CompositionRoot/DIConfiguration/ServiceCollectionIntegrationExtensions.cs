@@ -142,8 +142,7 @@ public static class ServiceCollectionIntegrationExtensions
 			})
 			.AddJwtBearer(options =>
 			{
-				var tokenSettings = new TokenProvider.Settings();
-				configuration.GetSection("TokenSettings").Bind(tokenSettings);
+				var tokenSettings = configuration.GetOrThrow<TokenProvider.Settings>("TokenSettings");
 
 				options.SaveToken = true;
 				options.RequireHttpsMetadata = false;

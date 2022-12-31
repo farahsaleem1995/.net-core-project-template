@@ -234,11 +234,18 @@ public class TokenProvider : ITokenProvider
 
 	public class Settings
 	{
-		public string Key { get; init; } = string.Empty;
+		public Settings(string key, TimeSpan accessLifetime, TimeSpan refreshLifetime)
+		{
+			Key = key;
+			AccessLifetime = accessLifetime;
+			RefreshLifetime = refreshLifetime;
+		}
 
-		public TimeSpan AccessLifetime { get; init; }
+		public string Key { get; }
 
-		public TimeSpan RefreshLifetime { get; init; }
+		public TimeSpan AccessLifetime { get; }
+
+		public TimeSpan RefreshLifetime { get; }
 
 		public string Issuer { get; init; } = string.Empty;
 
