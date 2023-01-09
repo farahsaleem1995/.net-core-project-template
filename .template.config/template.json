@@ -1,0 +1,22 @@
+{
+	"$schema": "http://json.schemastore.org/template",
+	"author": "Farah Saleem",
+	"classifications": ["Common", "WebApi", "AspNetCore", "Solution"],
+	"identity": "AspNetCore.CleanArchitecture",
+	"name": "Asp.Net Core: Clean Architecture",
+	"shortName": "aspclean",
+	"tags": {
+		"language": "C#",
+		"type": "solution"
+	},
+	"sourceName": "DotnetCoreTemplate",
+	"sources": [
+		{
+			"modifiers": [
+				{
+					"exclude": [".vs/**/*", ".git/**/*"]
+				}
+			]
+		}
+	]
+}
