@@ -1,18 +1,16 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
 using DotnetCoreTemplate.Domain.Shared;
-using DotnetCoreTemplate.WebAPI.CompositionRoot.Extensions;
+using DotnetCoreTemplate.WebAPI.CompositionRoot.Helpers;
 using SimpleInjector;
 
 namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Services;
 
-public delegate object FastInvoker(object instance, object parameterObject, object cancellationToken);
-
 public class Director : IDirector
 {
 	private readonly Container _container;
-	private readonly ILocalCache<Type, FastInvoker> _invokers;
+	private readonly ILocalCache<Type, TwoParameterMethodInvoker> _invokers;
 
-	public Director(Container container, ILocalCache<Type, FastInvoker> invokers)
+	public Director(Container container, ILocalCache<Type, TwoParameterMethodInvoker> invokers)
 	{
 		_container = container;
 		_invokers = invokers;
@@ -24,39 +22,47 @@ public class Director : IDirector
 
 		var handlerType = typeof(IRequestHandler<,>).MakeGenericType(requestType, typeof(TResult));
 
-		return await (Task<TResult>)FastInvoke(handlerType, "Handle", new object[] { request, cancellation });
+		var invoker = MakeFastMethodInvoker(handlerType, "Handle", new[] { requestType, typeof(CancellationToken) });
+
+		return await (Task<TResult>)Invoke(handlerType, invoker, new object[] { request, cancellation });
 	}
 
-	public Task DispatchEvent(DomainEvent domainEvent, CancellationToken cancellation)
+	public async Task DispatchEvent(DomainEvent domainEvent, CancellationToken cancellation)
 	{
 		var eventType = domainEvent.GetType();
 
 		var handlerType = typeof(IEventHandler<>).MakeGenericType(eventType);
 
-		return (Task)FastInvoke(handlerType, "Handle", new object[] { domainEvent, cancellation });
+		var invoker = MakeFastMethodInvoker(handlerType, "Handle", new[] { eventType, typeof(CancellationToken) });
+
+		await (Task)Invoke(handlerType, invoker, new object[] { domainEvent, cancellation });
 	}
 
-	public Task ExecuteWork(IWork work, CancellationToken cancellation)
+	public async Task ExecuteWork(IWork work, CancellationToken cancellation)
 	{
 		var workType = work.GetType();
 
 		var workerType = typeof(IWorker<>).MakeGenericType(workType);
 
-		return (Task)FastInvoke(workerType, "Execute", new object[] { work, cancellation });
+		var invoker = MakeFastMethodInvoker(workerType, "Execute", new[] { workType, typeof(CancellationToken) });
+
+		await (Task)Invoke(workerType, invoker, new object[] { work, cancellation });
 	}
 
-	private object FastInvoke(Type decalringType, string methodName, params object[] parameters)
+	private TwoParameterMethodInvoker MakeFastMethodInvoker(Type declaringType, string methodName, Type[] parameters)
+	{
+		return _invokers.Get(declaringType, _ =>
+		{
+			var helper = ObjectMethodHelper.Create(declaringType);
+
+			return helper.GetTwoParameterInvoker(methodName, parameters[0], parameters[1]);
+		});
+	}
+
+	private object Invoke(Type decalringType, TwoParameterMethodInvoker invoker, params object[] args)
 	{
 		var serviceInstance = _container.GetInstance(decalringType);
 
-		var fastInvoker = MakeFastInvoker(decalringType, methodName);
-
-		return fastInvoker(serviceInstance, parameters[0], parameters[1]);
-	}
-
-	private FastInvoker MakeFastInvoker(Type workerType, string methodName)
-	{
-		return _invokers.Get(workerType,
-			_ => workerType.MakeFastMethodInvoker<FastInvoker>(methodName));
+		return invoker(serviceInstance, args[0], args[1]);
 	}
 }
