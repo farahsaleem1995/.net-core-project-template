@@ -2,67 +2,93 @@
 using DotnetCoreTemplate.Domain.Shared;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Helpers;
 using SimpleInjector;
+using System.Collections.Concurrent;
 
 namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Services;
 
 public class Director : IDirector
 {
-	private readonly Container _container;
-	private readonly ILocalCache<Type, TwoParameterMethodInvoker> _invokers;
+	private static readonly ConcurrentDictionary<Type, RequestHandlerWrapperBase> _requestHandlers = new();
+	private static readonly ConcurrentDictionary<Type, EventHandlerWrapperBase> _eventHandlers = new();
+	private static readonly ConcurrentDictionary<Type, WorkerWrapperBase> _workers = new();
 
-	public Director(Container container, ILocalCache<Type, TwoParameterMethodInvoker> invokers)
+	private readonly Container _container;
+
+	public Director(Container container)
 	{
 		_container = container;
-		_invokers = invokers;
 	}
 
 	public async Task<TResult> SendRequest<TResult>(IRequest<TResult> request, CancellationToken cancellation)
 	{
 		var requestType = request.GetType();
 
-		var handlerType = typeof(IRequestHandler<,>).MakeGenericType(requestType, typeof(TResult));
+		var wrapper = CreateRequestHandlerWrapper<TResult>(requestType);
 
-		var invoker = MakeFastMethodInvoker(handlerType, "Handle", new[] { requestType, typeof(CancellationToken) });
+		return await wrapper.Handle(_container, request, cancellation);
+	}
 
-		return await (Task<TResult>)Invoke(handlerType, invoker, new object[] { request, cancellation });
+	public RequestHandlerWrapper<TResult> CreateRequestHandlerWrapper<TResult>(Type requestType)
+	{
+		return (RequestHandlerWrapper<TResult>)_requestHandlers.GetOrAdd(requestType, _ =>
+		{
+			var wrapper = Activator.CreateInstance(typeof(RequestHandlerWrapperImpl<,>)
+				.MakeGenericType(requestType, typeof(TResult)));
+
+			if (wrapper == null)
+			{
+				throw new InvalidOperationException($"Could not create wrapper type for {requestType}");
+			}
+
+			return (RequestHandlerWrapperBase)wrapper;
+		});
 	}
 
 	public async Task DispatchEvent(DomainEvent domainEvent, CancellationToken cancellation)
 	{
 		var eventType = domainEvent.GetType();
 
-		var handlerType = typeof(IEventHandler<>).MakeGenericType(eventType);
+		var wrapper = CreateEventHandlerWrapper(eventType);
 
-		var invoker = MakeFastMethodInvoker(handlerType, "Handle", new[] { eventType, typeof(CancellationToken) });
+		await wrapper.Handle(_container, domainEvent, cancellation);
+	}
 
-		await (Task)Invoke(handlerType, invoker, new object[] { domainEvent, cancellation });
+	public EventHandlerWrapperBase CreateEventHandlerWrapper(Type eventType)
+	{
+		return _eventHandlers.GetOrAdd(eventType, _ =>
+		{
+			var wrapper = Activator.CreateInstance(typeof(EventHandlerWrapperImpl<>).MakeGenericType(eventType));
+
+			if (wrapper == null)
+			{
+				throw new InvalidOperationException($"Could not create wrapper type for {eventType}");
+			}
+
+			return (EventHandlerWrapperBase)wrapper;
+		});
 	}
 
 	public async Task ExecuteWork(IWork work, CancellationToken cancellation)
 	{
 		var workType = work.GetType();
 
-		var workerType = typeof(IWorker<>).MakeGenericType(workType);
+		var wrapper = CreateWorkerWrapper(workType);
 
-		var invoker = MakeFastMethodInvoker(workerType, "Execute", new[] { workType, typeof(CancellationToken) });
-
-		await (Task)Invoke(workerType, invoker, new object[] { work, cancellation });
+		await wrapper.Execute(_container, work, cancellation);
 	}
 
-	private TwoParameterMethodInvoker MakeFastMethodInvoker(Type declaringType, string methodName, Type[] parameters)
+	public WorkerWrapperBase CreateWorkerWrapper(Type workType)
 	{
-		return _invokers.Get(declaringType, _ =>
+		return _workers.GetOrAdd(workType, _ =>
 		{
-			var helper = ObjectMethodHelper.Create(declaringType);
+			var wrapper = Activator.CreateInstance(typeof(WorkerWrapperImpl<>).MakeGenericType(workType));
 
-			return helper.GetTwoParameterInvoker(methodName, parameters[0], parameters[1]);
+			if (wrapper == null)
+			{
+				throw new InvalidOperationException($"Could not create wrapper type for {workType}");
+			}
+
+			return (WorkerWrapperBase)wrapper;
 		});
-	}
-
-	private object Invoke(Type decalringType, TwoParameterMethodInvoker invoker, params object[] args)
-	{
-		var serviceInstance = _container.GetInstance(decalringType);
-
-		return invoker(serviceInstance, args[0], args[1]);
 	}
 }

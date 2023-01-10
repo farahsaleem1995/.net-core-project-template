@@ -1,7 +1,6 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
 using DotnetCoreTemplate.Application.Shared.Services;
 using DotnetCoreTemplate.Infrastructure.Services;
-using DotnetCoreTemplate.WebAPI.CompositionRoot.Services;
 using DotnetCoreTemplate.WebAPI.Services;
 using SimpleInjector;
 
@@ -15,8 +14,6 @@ public static class UtilityContainerExtensions
 			.RegisterAuditTrail();
 
 		container.Register<ITimeProvider, UtcTimeProvider>(Lifestyle.Scoped);
-
-		container.Register(typeof(ILocalCache<,>), typeof(ConcurrentLocalCache<,>), Lifestyle.Singleton);
 
 		container.Register(typeof(Application.Shared.Interfaces.ILogger<>), typeof(AspNetLogger<>), Lifestyle.Singleton);
 

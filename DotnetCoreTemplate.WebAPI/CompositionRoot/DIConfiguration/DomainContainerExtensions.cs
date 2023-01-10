@@ -1,6 +1,7 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Decorators;
 using DotnetCoreTemplate.Application.Shared.Interfaces;
 using DotnetCoreTemplate.Application.Shared.Services;
+using DotnetCoreTemplate.Infrastructure.Background;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Adapters;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Composites;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Services;
@@ -13,7 +14,8 @@ public static class DomainContainerExtensions
 	public static Container RegisterDomainServices(this Container container)
 	{
 		container.RegisterRequestHandlers()
-			.RegisterEventHandlers();
+			.RegisterEventHandlers()
+			.RegisterWorkers();
 
 		return container;
 	}
@@ -38,6 +40,13 @@ public static class DomainContainerExtensions
 	{
 		container.Collection.Register(typeof(IEventHandler<>), typeof(IEventHandler<>).Assembly);
 		container.Register(typeof(IEventHandler<>), typeof(CompositeEventHandler<>));
+
+		return container;
+	}
+
+	private static Container RegisterWorkers(this Container container)
+	{
+		container.Register(typeof(IWorker<>), typeof(IWorker<>).Assembly);
 
 		return container;
 	}

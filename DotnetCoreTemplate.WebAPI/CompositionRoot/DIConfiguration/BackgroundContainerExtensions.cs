@@ -11,25 +11,18 @@ public static class BackgroundContainerExtensions
 {
 	public static Container RegisterBackgroundServices(this Container container)
 	{
-		container.RegisterWorkers();
+		container.Register<IWorkScheduler, QuartzWorkScheduler>(Lifestyle.Singleton);
 
-		container.RegisterQuartzJob();
+		container.Register<IWorkQueue, DefaultWorkQueue>(Lifestyle.Singleton);
+		container.RegisterInstance(new DefaultWorkQueue.QueueSettings(100));
 
-		container.RegisterWorkQueue();
-
-		container.RegisterHostedServices();
+		container.RegisterQuartzJob()
+			.RegisterHostedServices();
 
 		return container;
 	}
 
-	private static void RegisterWorkers(this Container container)
-	{
-		container.Register<IWorkScheduler, QuartzWorkScheduler>(Lifestyle.Singleton);
-
-		container.Register(typeof(IWorker<>), typeof(IWorker<>).Assembly);
-	}
-
-	private static void RegisterQuartzJob(this Container container)
+	private static Container RegisterQuartzJob(this Container container)
 	{
 		var jobTypesToRegisterOptions = new TypesToRegisterOptions
 		{
@@ -43,18 +36,15 @@ public static class BackgroundContainerExtensions
 		{
 			container.Register(type);
 		};
+
+		return container;
 	}
 
-	private static void RegisterWorkQueue(this Container container)
-	{
-		container.Register<IWorkQueue, DefaultWorkQueue>(Lifestyle.Singleton);
-
-		container.RegisterInstance(new DefaultWorkQueue.QueueSettings(100));
-	}
-
-	private static void RegisterHostedServices(this Container container)
+	private static Container RegisterHostedServices(this Container container)
 	{
 		container.RegisterInstance(
 			new DefaultHostedService<WorkQueueProcessor>.Settings(typeof(IProcessor).Assembly));
+
+		return container;
 	}
 }
