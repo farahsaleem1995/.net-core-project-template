@@ -6,11 +6,11 @@ namespace DotnetCoreTemplate.Infrastructure.Background;
 
 public class QuartzJob<TWork> : IJob where TWork : IWork
 {
-	private readonly IWorker<TWork> _worker;
+	private readonly IWorkHandler<TWork> _handler;
 
-	public QuartzJob(IWorker<TWork> worker)
+	public QuartzJob(IWorkHandler<TWork> handler)
 	{
-		_worker = worker;
+		_handler = handler;
 	}
 
 	public async Task Execute(IJobExecutionContext context)
@@ -21,7 +21,7 @@ public class QuartzJob<TWork> : IJob where TWork : IWork
 			return;
 		}
 
-		await _worker.Execute(work, context.CancellationToken);
+		await _handler.Handle(work, context.CancellationToken);
 	}
 
 	private static TWork? GetWork(IJobExecutionContext context)

@@ -15,7 +15,7 @@ public static class DomainContainerExtensions
 	{
 		container.RegisterRequestHandlers()
 			.RegisterEventHandlers()
-			.RegisterWorkers();
+			.RegisterWorkHandlers();
 
 		return container;
 	}
@@ -44,9 +44,9 @@ public static class DomainContainerExtensions
 		return container;
 	}
 
-	private static Container RegisterWorkers(this Container container)
+	private static Container RegisterWorkHandlers(this Container container)
 	{
-		container.Register(typeof(IWorker<>), typeof(IWorker<>).Assembly);
+		container.Register(typeof(IWorkHandler<>), typeof(IWorkHandler<>).Assembly);
 
 		return container;
 	}

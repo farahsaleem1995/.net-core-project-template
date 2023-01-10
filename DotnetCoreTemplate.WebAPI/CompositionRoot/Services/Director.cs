@@ -10,7 +10,7 @@ public class Director : IDirector
 {
 	private static readonly ConcurrentDictionary<Type, RequestHandlerWrapperBase> _requestHandlers = new();
 	private static readonly ConcurrentDictionary<Type, EventHandlerWrapperBase> _eventHandlers = new();
-	private static readonly ConcurrentDictionary<Type, WorkerWrapperBase> _workers = new();
+	private static readonly ConcurrentDictionary<Type, WorkHandlerWrapperBase> _workHandlers = new();
 
 	private readonly Container _container;
 
@@ -23,12 +23,12 @@ public class Director : IDirector
 	{
 		var requestType = request.GetType();
 
-		var wrapper = CreateRequestHandlerWrapper<TResult>(requestType);
+		var wrapper = GetOrAddRequestHandler<TResult>(requestType);
 
 		return await wrapper.Handle(_container, request, cancellation);
 	}
 
-	public RequestHandlerWrapper<TResult> CreateRequestHandlerWrapper<TResult>(Type requestType)
+	public RequestHandlerWrapper<TResult> GetOrAddRequestHandler<TResult>(Type requestType)
 	{
 		return (RequestHandlerWrapper<TResult>)_requestHandlers.GetOrAdd(requestType, _ =>
 		{
@@ -48,12 +48,12 @@ public class Director : IDirector
 	{
 		var eventType = domainEvent.GetType();
 
-		var wrapper = CreateEventHandlerWrapper(eventType);
+		var wrapper = GetOrAddEventHandler(eventType);
 
 		await wrapper.Handle(_container, domainEvent, cancellation);
 	}
 
-	public EventHandlerWrapperBase CreateEventHandlerWrapper(Type eventType)
+	public EventHandlerWrapperBase GetOrAddEventHandler(Type eventType)
 	{
 		return _eventHandlers.GetOrAdd(eventType, _ =>
 		{
@@ -72,23 +72,23 @@ public class Director : IDirector
 	{
 		var workType = work.GetType();
 
-		var wrapper = CreateWorkerWrapper(workType);
+		var wrapper = GetOrAddWorkHandler(workType);
 
-		await wrapper.Execute(_container, work, cancellation);
+		await wrapper.Handler(_container, work, cancellation);
 	}
 
-	public WorkerWrapperBase CreateWorkerWrapper(Type workType)
+	public WorkHandlerWrapperBase GetOrAddWorkHandler(Type workType)
 	{
-		return _workers.GetOrAdd(workType, _ =>
+		return _workHandlers.GetOrAdd(workType, _ =>
 		{
-			var wrapper = Activator.CreateInstance(typeof(WorkerWrapperImpl<>).MakeGenericType(workType));
+			var wrapper = Activator.CreateInstance(typeof(WorkHandlerWrapperImpl<>).MakeGenericType(workType));
 
 			if (wrapper == null)
 			{
 				throw new InvalidOperationException($"Could not create wrapper type for {workType}");
 			}
 
-			return (WorkerWrapperBase)wrapper;
+			return (WorkHandlerWrapperBase)wrapper;
 		});
 	}
 }

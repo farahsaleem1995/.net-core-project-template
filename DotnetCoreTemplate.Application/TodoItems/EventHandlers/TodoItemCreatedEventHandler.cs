@@ -4,15 +4,15 @@ using DotnetCoreTemplate.Application.TodoItems.Workers;
 
 namespace DotnetCoreTemplate.Application.TodoItems.EventHandlers;
 
-public class TodoItemCreatedHandler : IEventHandler<TodoItemCreatedEvent>
+public class TodoItemCreatedEventHandler : IEventHandler<TodoItemCreatedEvent>
 {
-	private readonly ILogger<TodoItemCreatedHandler> _logger;
+	private readonly ILogger<TodoItemCreatedEventHandler> _logger;
 	private readonly ITimeProvider _timeProvider;
 	private readonly IWorkScheduler _scheduler;
 	private readonly IWorkQueue _queue;
 
-	public TodoItemCreatedHandler(
-		ILogger<TodoItemCreatedHandler> logger,
+	public TodoItemCreatedEventHandler(
+		ILogger<TodoItemCreatedEventHandler> logger,
 		ITimeProvider timeProvider,
 		IWorkScheduler scheduler,
 		IWorkQueue queue)
@@ -29,8 +29,8 @@ public class TodoItemCreatedHandler : IEventHandler<TodoItemCreatedEvent>
 
 		var firingTime = _timeProvider.Now.AddSeconds(5);
 
-		await _scheduler.Schedule(new CreateTodoWork(domainEvent.Id), firingTime, cancellation);
+		await _scheduler.Schedule(new TodoItemCreatedWork(domainEvent.Id), firingTime, cancellation);
 
-		await _queue.Enqueue(new CreateTodoWork(domainEvent.Id), cancellation);
+		await _queue.Enqueue(new TodoItemCreatedWork(domainEvent.Id), cancellation);
 	}
 }
