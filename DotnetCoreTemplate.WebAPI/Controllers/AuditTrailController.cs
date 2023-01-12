@@ -7,7 +7,7 @@ namespace DotnetCoreTemplate.WebAPI.Controllers;
 [Route("audit-trail")]
 public class AuditTrailController : ApiControllerBase
 {
-	public AuditTrailController(IDirector director) : base(director)
+	public AuditTrailController(ISender sender) : base(sender)
 	{
 	}
 
@@ -15,7 +15,7 @@ public class AuditTrailController : ApiControllerBase
 	public async Task<IActionResult> Get(
 		[FromQuery] GetAuditTrailQuery query, CancellationToken cancellation)
 	{
-		var tail = await Director.SendRequest(query, cancellation);
+		var tail = await Sender.Send(query, cancellation);
 
 		return Ok(tail);
 	}

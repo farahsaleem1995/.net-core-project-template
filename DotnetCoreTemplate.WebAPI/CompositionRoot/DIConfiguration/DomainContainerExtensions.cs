@@ -13,6 +13,9 @@ public static class DomainContainerExtensions
 {
 	public static Container RegisterDomainServices(this Container container)
 	{
+		container.Register<ISender, Director>();
+		container.Register<IDispatcher, Director>();
+
 		container.RegisterRequestHandlers()
 			.RegisterEventHandlers()
 			.RegisterWorkHandlers();
@@ -22,8 +25,6 @@ public static class DomainContainerExtensions
 
 	private static Container RegisterRequestHandlers(this Container container)
 	{
-		container.Register<IDirector, Director>(Lifestyle.Singleton);
-
 		container.Register(typeof(IRequestHandler<,>), typeof(IRequestHandler<,>).Assembly);
 		container.Register(typeof(IRequestHandler<>), typeof(UnitCommandAdapter<>));
 

@@ -6,16 +6,16 @@ namespace DotnetCoreTemplate.Infrastructure.Persistence.Decorator;
 public class EventDispatchUnitOfWorkDecorator : IUnitOfWork
 {
 	private readonly IUnitOfWork _decoratee;
-	private readonly IDirector _director;
+	private readonly IDispatcher _dispatcher;
 	private readonly ApplicationDbContext _dbContext;
 
 	public EventDispatchUnitOfWorkDecorator(
 		IUnitOfWork decoratee,
-		IDirector director,
+		IDispatcher dispatcher,
 		ApplicationDbContext dbContext)
 	{
 		_decoratee = decoratee;
-		_director = director;
+		_dispatcher = dispatcher;
 		_dbContext = dbContext;
 	}
 
@@ -30,7 +30,7 @@ public class EventDispatchUnitOfWorkDecorator : IUnitOfWork
 				if (!domainEvent.IsDispatched)
 				{
 					domainEvent.IsDispatched = true;
-					await _director.DispatchEvent(domainEvent, cancellation);
+					await _dispatcher.Dispatch(domainEvent, cancellation);
 				}
 			}
 		}

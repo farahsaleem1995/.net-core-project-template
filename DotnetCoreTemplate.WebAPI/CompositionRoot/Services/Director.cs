@@ -6,11 +6,10 @@ using System.Collections.Concurrent;
 
 namespace DotnetCoreTemplate.WebAPI.CompositionRoot.Services;
 
-public class Director : IDirector
+public class Director : ISender, IDispatcher
 {
 	private static readonly ConcurrentDictionary<Type, RequestHandlerWrapperBase> _requestHandlers = new();
 	private static readonly ConcurrentDictionary<Type, EventHandlerWrapperBase> _eventHandlers = new();
-	private static readonly ConcurrentDictionary<Type, WorkHandlerWrapperBase> _workHandlers = new();
 
 	private readonly Container _container;
 
@@ -19,7 +18,7 @@ public class Director : IDirector
 		_container = container;
 	}
 
-	public async Task<TResult> SendRequest<TResult>(IRequest<TResult> request, CancellationToken cancellation)
+	public async Task<TResult> Send<TResult>(IRequest<TResult> request, CancellationToken cancellation)
 	{
 		var requestType = request.GetType();
 
@@ -44,7 +43,7 @@ public class Director : IDirector
 		});
 	}
 
-	public async Task DispatchEvent(DomainEvent domainEvent, CancellationToken cancellation)
+	public async Task Dispatch(DomainEvent domainEvent, CancellationToken cancellation)
 	{
 		var eventType = domainEvent.GetType();
 
@@ -65,30 +64,6 @@ public class Director : IDirector
 			}
 
 			return (EventHandlerWrapperBase)wrapper;
-		});
-	}
-
-	public async Task ExecuteWork(IWork work, CancellationToken cancellation)
-	{
-		var workType = work.GetType();
-
-		var wrapper = GetOrAddWorkHandler(workType);
-
-		await wrapper.Handler(_container, work, cancellation);
-	}
-
-	public WorkHandlerWrapperBase GetOrAddWorkHandler(Type workType)
-	{
-		return _workHandlers.GetOrAdd(workType, _ =>
-		{
-			var wrapper = Activator.CreateInstance(typeof(WorkHandlerWrapperImpl<>).MakeGenericType(workType));
-
-			if (wrapper == null)
-			{
-				throw new InvalidOperationException($"Could not create wrapper type for {workType}");
-			}
-
-			return (WorkHandlerWrapperBase)wrapper;
 		});
 	}
 }

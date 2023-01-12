@@ -8,7 +8,7 @@ namespace DotnetCoreTemplate.WebAPI.Controllers;
 
 public class UsersController : ApiControllerBase
 {
-	public UsersController(IDirector director) : base(director)
+	public UsersController(ISender sender) : base(sender)
 	{
 	}
 
@@ -16,7 +16,7 @@ public class UsersController : ApiControllerBase
 	public async Task<IActionResult> Get(
 		[FromQuery] GetUsersQuery query, CancellationToken cancellation)
 	{
-		var users = await Director.SendRequest(query, cancellation);
+		var users = await Sender.Send(query, cancellation);
 
 		return Ok(users);
 	}
@@ -25,7 +25,7 @@ public class UsersController : ApiControllerBase
 	public async Task<IActionResult> Get(
 		[FromBody] CreateUserCommand command, CancellationToken cancellation)
 	{
-		await Director.SendRequest(command, cancellation);
+		await Sender.Send(command, cancellation);
 
 		return NoContent();
 	}
@@ -33,7 +33,7 @@ public class UsersController : ApiControllerBase
 	[HttpGet("{id}")]
 	public async Task<IActionResult> Get([FromRoute] string id, CancellationToken cancellation)
 	{
-		var user = await Director.SendRequest(new GetUserByIdQuery(id), cancellation);
+		var user = await Sender.Send(new GetUserByIdQuery(id), cancellation);
 
 		return Ok(user);
 	}

@@ -9,7 +9,7 @@ namespace DotnetCoreTemplate.WebAPI.Controllers;
 
 public class AuthController : ApiControllerBase
 {
-	public AuthController(IDirector director) : base(director)
+	public AuthController(ISender sender) : base(sender)
 	{
 	}
 
@@ -17,7 +17,7 @@ public class AuthController : ApiControllerBase
 	public async Task<IActionResult> RegisterAccount(
 		[FromBody] RegisterUserCommand command, CancellationToken cancellation)
 	{
-		await Director.SendRequest(command, cancellation);
+		await Sender.Send(command, cancellation);
 
 		return NoContent();
 	}
@@ -26,7 +26,7 @@ public class AuthController : ApiControllerBase
 	public async Task<IActionResult> SignIn(
 		[FromBody] SignInCommand command, CancellationToken cancellation)
 	{
-		var token = await Director.SendRequest(command, cancellation);
+		var token = await Sender.Send(command, cancellation);
 
 		return Ok(token);
 	}
@@ -34,7 +34,7 @@ public class AuthController : ApiControllerBase
 	[HttpPost("sign-out")]
 	public async Task<IActionResult> SignOut(CancellationToken cancellation)
 	{
-		await Director.SendRequest(new SignOutCommand(), cancellation);
+		await Sender.Send(new SignOutCommand(), cancellation);
 
 		return NoContent();
 	}
@@ -43,7 +43,7 @@ public class AuthController : ApiControllerBase
 	public async Task<IActionResult> RefreshToken(
 		[FromBody] RefreshTokenCommand command, CancellationToken cancellation)
 	{
-		var token = await Director.SendRequest(command, cancellation);
+		var token = await Sender.Send(command, cancellation);
 
 		return Ok(token);
 	}
