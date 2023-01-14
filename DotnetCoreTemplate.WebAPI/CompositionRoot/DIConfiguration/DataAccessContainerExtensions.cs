@@ -1,8 +1,6 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
-using DotnetCoreTemplate.Infrastructure.Persistence.Decorator;
 using DotnetCoreTemplate.Infrastructure.Persistence.Interfaces;
 using DotnetCoreTemplate.Infrastructure.Persistence.Services;
-using DotnetCoreTemplate.Infrastructure.Services;
 using SimpleInjector;
 
 namespace DotnetCoreTemplate.WebAPI.CompositionRoot.DIConfiguration;
@@ -11,22 +9,20 @@ public static class DataAccessContainerExtensions
 {
 	public static Container RegisterDataAccess(this Container container)
 	{
-		container.Register<IUnitOfWork, EFUnitOfWork>(Lifestyle.Scoped);
-		container.RegisterDecorator<IUnitOfWork, EventDispatchUnitOfWorkDecorator>(Lifestyle.Scoped);
-		container.RegisterDecorator<IUnitOfWork, AuditUnitOfWorkDecorator>(Lifestyle.Scoped);
+		container.Register<IUnitOfWork, EFUnitOfWork>();
 
-		container.Register(typeof(IRepository<>), typeof(EFRepository<>), Lifestyle.Scoped);
+		container.Register(typeof(IRepository<>), typeof(EFRepository<>));
 
 		container.Collection.Register<ISpecificationEvaluator>(new[]
 		{
-			Lifestyle.Scoped.CreateRegistration(typeof(EFFilterSpecificationEvaluator), container),
-			Lifestyle.Scoped.CreateRegistration(typeof(EFIncludeSpecificationEvaluator), container),
-			Lifestyle.Scoped.CreateRegistration(typeof(EFOrderSpecificationEvaluator), container),
-			Lifestyle.Scoped.CreateRegistration(typeof(EFPaginationSpecificationEvaluator), container),
+			Lifestyle.Transient.CreateRegistration(typeof(EFFilterSpecificationEvaluator), container),
+			Lifestyle.Transient.CreateRegistration(typeof(EFIncludeSpecificationEvaluator), container),
+			Lifestyle.Transient.CreateRegistration(typeof(EFOrderSpecificationEvaluator), container),
+			Lifestyle.Transient.CreateRegistration(typeof(EFPaginationSpecificationEvaluator), container),
 		});
-		container.Register<ISpecificationEvaluator, EFSpecificationEvaluator>(Lifestyle.Scoped);
+		container.Register<ISpecificationEvaluator, EFSpecificationEvaluator>();
 
-		container.Register<ISpecificationProjector, EFFSpecificationProjector>(Lifestyle.Scoped);
+		container.Register<ISpecificationProjector, EFFSpecificationProjector>();
 
 		return container;
 	}

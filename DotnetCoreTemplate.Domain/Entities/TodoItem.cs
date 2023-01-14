@@ -20,7 +20,7 @@ public class TodoItem : Auditable, IHasDomainEvents
 
 	public TodoItemStatus Status { get; private set; }
 
-	public List<DomainEvent> DomainEvents => new();
+	public ICollection<DomainEvent> DomainEvents { get; private set; } = new List<DomainEvent>();
 
 	public static TodoItem Create(string title, string description)
 	{

@@ -2,5 +2,5 @@
 
 public interface IHasDomainEvents
 {
-	public List<DomainEvent> DomainEvents { get; }
+	public ICollection<DomainEvent> DomainEvents { get; }
 }
