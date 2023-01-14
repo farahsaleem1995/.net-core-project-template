@@ -11,9 +11,9 @@ public class WorkQueueProcessor : IProcessor
 	private static readonly ConcurrentDictionary<Type, WorkHandlerWrapperBase> _workHandlers = new();
 
 	private readonly Container _container;
-	private readonly IWorkQueue _queue;
+	private readonly IQueue _queue;
 
-	public WorkQueueProcessor(Container container, IWorkQueue queue)
+	public WorkQueueProcessor(Container container, IQueue queue)
 	{
 		_container = container;
 		_queue = queue;

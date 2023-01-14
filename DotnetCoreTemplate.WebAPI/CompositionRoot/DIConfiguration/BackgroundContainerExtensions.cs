@@ -4,6 +4,7 @@ using DotnetCoreTemplate.WebAPI.CompositionRoot.Host;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Services;
 using Quartz;
 using SimpleInjector;
+using IScheduler = DotnetCoreTemplate.Application.Shared.Interfaces.IScheduler;
 
 namespace DotnetCoreTemplate.WebAPI.CompositionRoot.DIConfiguration;
 
@@ -11,9 +12,9 @@ public static class BackgroundContainerExtensions
 {
 	public static Container RegisterBackgroundServices(this Container container)
 	{
-		container.Register<IWorkScheduler, QuartzWorkScheduler>(Lifestyle.Singleton);
+		container.Register<IScheduler, QuartzWorkScheduler>(Lifestyle.Singleton);
 
-		container.Register<IWorkQueue, DefaultWorkQueue>(Lifestyle.Singleton);
+		container.Register<IQueue, DefaultWorkQueue>(Lifestyle.Singleton);
 		container.RegisterInstance(new DefaultWorkQueue.QueueSettings(100));
 
 		container.RegisterQuartzJob()

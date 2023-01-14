@@ -1,10 +1,11 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
 using DotnetCoreTemplate.Infrastructure.Extensions;
 using Quartz;
+using IScheduler = DotnetCoreTemplate.Application.Shared.Interfaces.IScheduler;
 
 namespace DotnetCoreTemplate.Infrastructure.Background;
 
-public class QuartzWorkScheduler : IWorkScheduler
+public class QuartzWorkScheduler : IScheduler
 {
 	private readonly ISchedulerFactory _schedulerFactory;
 

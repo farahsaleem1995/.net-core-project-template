@@ -1,16 +1,15 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
-using DotnetCoreTemplate.Application.Shared.Models;
 using System.Threading.Channels;
 
 namespace DotnetCoreTemplate.Infrastructure.Background;
 
-public class DefaultWorkQueue : IWorkQueue
+public class DefaultWorkQueue : IQueue
 {
 	private readonly Channel<IWork> _queue;
 
 	public DefaultWorkQueue(QueueSettings settings)
 	{
-		var options = new BoundedChannelOptions(settings.Cpacity)
+		var options = new BoundedChannelOptions(settings.Capacity)
 		{
 			FullMode = BoundedChannelFullMode.Wait
 		};
@@ -37,9 +36,9 @@ public class DefaultWorkQueue : IWorkQueue
 	{
 		public QueueSettings(int cpacity)
 		{
-			Cpacity = cpacity;
+			Capacity = cpacity;
 		}
 
-		public int Cpacity { get; }
+		public int Capacity { get; }
 	}
 }

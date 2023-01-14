@@ -8,14 +8,14 @@ public class TodoItemCreatedEventHandler : IEventHandler<TodoItemCreatedEvent>
 {
 	private readonly ILogger<TodoItemCreatedEventHandler> _logger;
 	private readonly ITimeProvider _timeProvider;
-	private readonly IWorkScheduler _scheduler;
-	private readonly IWorkQueue _queue;
+	private readonly IScheduler _scheduler;
+	private readonly IQueue _queue;
 
 	public TodoItemCreatedEventHandler(
 		ILogger<TodoItemCreatedEventHandler> logger,
 		ITimeProvider timeProvider,
-		IWorkScheduler scheduler,
-		IWorkQueue queue)
+		IScheduler scheduler,
+		IQueue queue)
 	{
 		_logger = logger;
 		_timeProvider = timeProvider;
