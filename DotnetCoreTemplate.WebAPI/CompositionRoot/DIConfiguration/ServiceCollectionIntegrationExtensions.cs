@@ -1,4 +1,5 @@
-﻿using DotnetCoreTemplate.Infrastructure.Identity;
+﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
+using DotnetCoreTemplate.Infrastructure.Identity;
 using DotnetCoreTemplate.Infrastructure.Persistence;
 using DotnetCoreTemplate.WebAPI.CompositionRoot.Factories;
 using DotnetCoreTemplate.WebAPI.Extensions;
@@ -27,6 +28,8 @@ public static class ServiceCollectionIntegrationExtensions
 		services.AddIdentity();
 		services.AddAuthentication(configuration);
 		services.AddQuartz();
+
+		services.AddAutoMapper(typeof(ISender).Assembly);
 
 		services.Configure(configuration);
 

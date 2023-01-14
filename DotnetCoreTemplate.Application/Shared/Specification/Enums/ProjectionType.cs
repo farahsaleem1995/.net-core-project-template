@@ -2,5 +2,6 @@
 
 public enum ProjectionType
 {
-	Selection
+	Selection,
+	AutoMapper
 }

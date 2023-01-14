@@ -1,7 +1,6 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
 using DotnetCoreTemplate.Application.Shared.Models;
 using DotnetCoreTemplate.Application.Shared.Specification;
-using DotnetCoreTemplate.Application.Shared.Specification.Interfaces;
 using DotnetCoreTemplate.Infrastructure.Persistence.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,17 +9,20 @@ namespace DotnetCoreTemplate.Infrastructure.Persistence.Services;
 public class EFRepository<TEntity> : IRepository<TEntity> where TEntity : class
 {
 	private readonly ApplicationDbContext _dbContext;
-	private readonly ISpecificationEvaluator _evaluator;
-	private readonly ISpecificationProjector _projector;
+	private readonly IEvaluator _evaluator;
+	private readonly IProjector _projector;
+	private readonly IPaginator _paginator;
 
 	public EFRepository(
 		ApplicationDbContext dbContext,
-		ISpecificationEvaluator evaluator,
-		ISpecificationProjector projector)
+		IEvaluator evaluator,
+		IProjector projector,
+		IPaginator paginator)
 	{
 		_dbContext = dbContext;
 		_evaluator = evaluator;
 		_projector = projector;
+		_paginator = paginator;
 	}
 
 	public async Task AddAsync(TEntity entity, CancellationToken cancellation = default)
@@ -72,7 +74,7 @@ public class EFRepository<TEntity> : IRepository<TEntity> where TEntity : class
 
 		var query = _evaluator.Evaluate(_dbContext.Set<TEntity>(), specification);
 
-		return await Paginate(query, specification, cancellation);
+		return await _paginator.Paginate(query, specification, cancellation);
 	}
 
 	public async Task<PaginatedList<TResult>> PaginateAsync<TResult>(
@@ -84,15 +86,6 @@ public class EFRepository<TEntity> : IRepository<TEntity> where TEntity : class
 		var query = _evaluator.Evaluate(_dbContext.Set<TEntity>(), specification);
 		var resultQuery = _projector.Project(query, specification);
 
-		return await Paginate(resultQuery, specification, cancellation);
-	}
-
-	private async Task<PaginatedList<T>> Paginate<T>(
-		IQueryable<T> query, IPaginationSpecification specification, CancellationToken cancellation)
-	{
-		var items = await query.ToListAsync(cancellation);
-		var totalItems = await _dbContext.Set<TEntity>().CountAsync(cancellation);
-
-		return new PaginatedList<T>(items, totalItems, specification.PageNumber, specification.PageSize);
+		return await _paginator.Paginate(resultQuery, specification, cancellation);
 	}
 }

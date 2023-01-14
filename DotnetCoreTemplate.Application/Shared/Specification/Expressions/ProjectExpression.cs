@@ -5,6 +5,11 @@ namespace DotnetCoreTemplate.Application.Shared.Specification.Expressions;
 
 public record ProjectExpression<TEntity, TResult>
 {
+	public ProjectExpression()
+	{
+		Type = ProjectionType.AutoMapper;
+	}
+
 	public ProjectExpression(Expression<Func<TEntity, TResult>> expression)
 	{
 		Type = ProjectionType.Selection;
@@ -13,5 +18,5 @@ public record ProjectExpression<TEntity, TResult>
 
 	public ProjectionType Type { get; private set; }
 
-	public Expression<Func<TEntity, TResult>> Expression { get; }
+	public Expression<Func<TEntity, TResult>>? Expression { get; }
 }

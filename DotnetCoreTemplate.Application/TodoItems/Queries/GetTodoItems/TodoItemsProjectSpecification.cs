@@ -7,8 +7,8 @@ public class TodoItemsProjectSpecification : ProjectSpecificationBase<TodoItem, 
 {
 	public TodoItemsProjectSpecification(int pageNumber, byte pageSize)
 	{
-		Paginate(pageNumber, pageSize)
-			.OrderBy(t => t.Id);
+		OrderByDescending(t => t.CreatedDate)
+			.Paginate(pageNumber, pageSize);
 
 		Project(t => new TodoItemsDto(t.Id, t.Title, t.Description, t.Status));
 	}

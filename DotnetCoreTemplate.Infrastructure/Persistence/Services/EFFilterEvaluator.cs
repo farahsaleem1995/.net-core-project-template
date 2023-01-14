@@ -3,18 +3,13 @@ using DotnetCoreTemplate.Infrastructure.Persistence.Interfaces;
 
 namespace DotnetCoreTemplate.Infrastructure.Persistence.Services;
 
-public class EFPaginationSpecificationEvaluator : ISpecificationEvaluator
+public class EFFilterEvaluator : IEvaluator
 {
 	public IQueryable<TEntity> Evaluate<TEntity>(IQueryable<TEntity> query, SpecificationBase<TEntity> specification)
 		where TEntity : class
 	{
-		if (specification.ApplyPagination)
-		{
-			var skip = specification.PageSize * (specification.PageNumber - 1);
-			var take = specification.PageSize;
-
-			return query.Skip(skip).Take(take);
-		}
+		foreach (var filter in specification.FilterExpressions)
+			query = query.Where(filter.Expression);
 
 		return query;
 	}
