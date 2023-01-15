@@ -1,5 +1,6 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
 using DotnetCoreTemplate.Application.Shared.Specifications.Interfaces;
+using DotnetCoreTemplate.Infrastructure.Persistence.Evaluators;
 using DotnetCoreTemplate.Infrastructure.Persistence.Services;
 using SimpleInjector;
 
@@ -15,6 +16,8 @@ public static class DataAccessContainerExtensions
 
 		container.Collection.Register<IEvaluator>(new[]
 		{
+			Lifestyle.Transient.CreateRegistration(typeof(EFQueryBehaviourEvaluator), container),
+			Lifestyle.Transient.CreateRegistration(typeof(EFTrackingBehaviourEvaluator), container),
 			Lifestyle.Transient.CreateRegistration(typeof(EFIncludeEvaluator), container),
 			Lifestyle.Transient.CreateRegistration(typeof(EFFilterEvaluator), container),
 			Lifestyle.Transient.CreateRegistration(typeof(EFOrderEvaluator), container),

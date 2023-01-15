@@ -2,7 +2,7 @@
 using DotnetCoreTemplate.Application.Shared.Specifications.Expressions;
 using DotnetCoreTemplate.Application.Shared.Specifications.Interfaces;
 
-namespace DotnetCoreTemplate.Infrastructure.Persistence.Services;
+namespace DotnetCoreTemplate.Infrastructure.Persistence.Evaluators;
 
 public class EFOrderEvaluator : IEvaluator
 {

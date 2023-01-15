@@ -42,6 +42,9 @@ public abstract class SpecificationBase<T> : ISpecification<T>
 
 	public int PageSize { get; private set; }
 
+	public TrackingBehaviour TrackingBehaviour { get; private set; } = TrackingBehaviour.Track;
+	public QueryBehaviour QueryBehaviour { get; private set; } = QueryBehaviour.Single;
+
 	public void WithFilter(Expression<Func<T, bool>> expression)
 	{
 		_filterExpressions.Add(new FilterExpression<T>(expression));
@@ -70,5 +73,15 @@ public abstract class SpecificationBase<T> : ISpecification<T>
 	public void Size(int pageSize)
 	{
 		PageSize = pageSize;
+	}
+
+	public void AsNoTracking()
+	{
+		TrackingBehaviour = TrackingBehaviour.NoTrack;
+	}
+
+	public void AsSplitQuery()
+	{
+		QueryBehaviour = QueryBehaviour.Split;
 	}
 }

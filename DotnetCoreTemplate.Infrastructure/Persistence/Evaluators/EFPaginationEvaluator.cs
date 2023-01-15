@@ -1,6 +1,6 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Specifications.Interfaces;
 
-namespace DotnetCoreTemplate.Infrastructure.Persistence.Services;
+namespace DotnetCoreTemplate.Infrastructure.Persistence.Evaluators;
 
 public class EFPaginationEvaluator : IEvaluator
 {

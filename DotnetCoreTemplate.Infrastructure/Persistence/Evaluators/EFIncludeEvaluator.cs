@@ -3,7 +3,7 @@ using DotnetCoreTemplate.Application.Shared.Specifications.Expressions;
 using DotnetCoreTemplate.Application.Shared.Specifications.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace DotnetCoreTemplate.Infrastructure.Persistence.Services;
+namespace DotnetCoreTemplate.Infrastructure.Persistence.Evaluators;
 
 public class EFIncludeEvaluator : IEvaluator
 {

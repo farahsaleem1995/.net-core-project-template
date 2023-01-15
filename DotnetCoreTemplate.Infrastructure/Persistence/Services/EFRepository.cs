@@ -82,7 +82,7 @@ public class EFRepository<T> : IRepository<T> where T : class
 		return await AsPaginatedList(specification, listQuery, countQuery, cancellation);
 	}
 
-	private static async Task<PaginatedList<TITem>> AsPaginatedList<TITem>(IPaginationSpecification specification,
+	private static async Task<PaginatedList<TITem>> AsPaginatedList<TITem>(ISpecification<T> specification,
 		IQueryable<TITem> listQuery, IQueryable<TITem> countQuery, CancellationToken cancellation)
 	{
 		var list = await listQuery.ToListAsync(cancellation);
