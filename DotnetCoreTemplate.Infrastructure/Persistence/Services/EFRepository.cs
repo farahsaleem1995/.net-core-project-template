@@ -1,31 +1,22 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
 using DotnetCoreTemplate.Application.Shared.Models;
-using DotnetCoreTemplate.Application.Shared.Specification;
-using DotnetCoreTemplate.Infrastructure.Persistence.Interfaces;
+using DotnetCoreTemplate.Application.Shared.Specifications.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace DotnetCoreTemplate.Infrastructure.Persistence.Services;
 
-public class EFRepository<TEntity> : IRepository<TEntity> where TEntity : class
+public class EFRepository<T> : IRepository<T> where T : class
 {
 	private readonly ApplicationDbContext _dbContext;
-	private readonly IEvaluator _evaluator;
-	private readonly IProjector _projector;
-	private readonly IPaginator _paginator;
+	private readonly ISpecificationEvaluator _evaluator;
 
-	public EFRepository(
-		ApplicationDbContext dbContext,
-		IEvaluator evaluator,
-		IProjector projector,
-		IPaginator paginator)
+	public EFRepository(ApplicationDbContext dbContext, ISpecificationEvaluator evaluator)
 	{
 		_dbContext = dbContext;
 		_evaluator = evaluator;
-		_projector = projector;
-		_paginator = paginator;
 	}
 
-	public async Task AddAsync(TEntity entity, CancellationToken cancellation = default)
+	public async Task AddAsync(T entity, CancellationToken cancellation = default)
 	{
 		if (entity == null)
 			throw new ArgumentNullException(nameof(entity));
@@ -33,7 +24,7 @@ public class EFRepository<TEntity> : IRepository<TEntity> where TEntity : class
 		await _dbContext.AddAsync(entity, cancellation);
 	}
 
-	public Task RemoveAsync(TEntity entity, CancellationToken cancellation = default)
+	public Task RemoveAsync(T entity, CancellationToken cancellation = default)
 	{
 		if (entity == null)
 			throw new ArgumentNullException(nameof(entity));
@@ -43,49 +34,60 @@ public class EFRepository<TEntity> : IRepository<TEntity> where TEntity : class
 		return Task.CompletedTask;
 	}
 
-	public async Task<TEntity?> FirstOrDefaultAsync(SpecificationBase<TEntity> specification,
+	public async Task<T?> FirstOrDefaultAsync(ISpecification<T> specification,
 		CancellationToken cancellation = default)
 	{
 		if (specification == null)
 			throw new ArgumentNullException(nameof(specification));
 
-		var query = _evaluator.Evaluate(_dbContext.Set<TEntity>(), specification);
+		var query = _evaluator.EvaluateQuery(_dbContext.Set<T>(), specification, true);
 
 		return await query.FirstOrDefaultAsync(cancellation);
 	}
 
 	public async Task<TResult?> FirstOrDefaultAsync<TResult>(
-		ProjectSpecificationBase<TEntity, TResult> specification, CancellationToken cancellation = default)
+		ISpecification<T, TResult> specification, CancellationToken cancellation = default)
 	{
 		if (specification == null)
 			throw new ArgumentNullException(nameof(specification));
 
-		var query = _evaluator.Evaluate(_dbContext.Set<TEntity>(), specification);
-		var resultQuery = _projector.Project(query, specification);
+		var query = _evaluator.EvaluateQuery(_dbContext.Set<T>(), specification, true);
 
-		return await resultQuery.FirstOrDefaultAsync(cancellation);
+		return await query.FirstOrDefaultAsync(cancellation);
 	}
 
-	public async Task<PaginatedList<TEntity>> PaginateAsync(SpecificationBase<TEntity> specification,
+	public async Task<PaginatedList<T>> PaginateAsync(ISpecification<T> specification,
 		CancellationToken cancellation = default)
 	{
 		if (specification == null)
 			throw new ArgumentNullException(nameof(specification));
 
-		var query = _evaluator.Evaluate(_dbContext.Set<TEntity>(), specification);
+		var dbSet = _dbContext.Set<T>();
+		var listQuery = _evaluator.EvaluateQuery(dbSet, specification, false);
+		var countQuery = _evaluator.EvaluateQuery(dbSet, specification, true);
 
-		return await _paginator.Paginate(query, specification, cancellation);
+		return await AsPaginatedList(specification, listQuery, countQuery, cancellation);
 	}
 
 	public async Task<PaginatedList<TResult>> PaginateAsync<TResult>(
-		ProjectSpecificationBase<TEntity, TResult> specification, CancellationToken cancellation = default)
+		ISpecification<T, TResult> specification, CancellationToken cancellation = default)
 	{
 		if (specification == null)
 			throw new ArgumentNullException(nameof(specification));
 
-		var query = _evaluator.Evaluate(_dbContext.Set<TEntity>(), specification);
-		var resultQuery = _projector.Project(query, specification);
+		var dbSet = _dbContext.Set<T>();
+		var listQuery = _evaluator.EvaluateQuery(dbSet, specification, false);
+		var countQuery = _evaluator.EvaluateQuery(dbSet, specification, true);
 
-		return await _paginator.Paginate(resultQuery, specification, cancellation);
+		return await AsPaginatedList(specification, listQuery, countQuery, cancellation);
+	}
+
+	private static async Task<PaginatedList<TITem>> AsPaginatedList<TITem>(IPaginationSpecification specification,
+		IQueryable<TITem> listQuery, IQueryable<TITem> countQuery, CancellationToken cancellation)
+	{
+		var list = await listQuery.ToListAsync(cancellation);
+		var count = await countQuery.CountAsync(cancellation);
+
+		return new PaginatedList<TITem>(list, count, specification.PageNumber, specification.PageSize);
 	}
 }

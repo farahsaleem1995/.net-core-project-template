@@ -1,15 +1,18 @@
-﻿using DotnetCoreTemplate.Application.Shared.Specification;
-using DotnetCoreTemplate.Infrastructure.Persistence.Interfaces;
+﻿using DotnetCoreTemplate.Application.Shared.Specifications.Interfaces;
 
 namespace DotnetCoreTemplate.Infrastructure.Persistence.Services;
 
 public class EFFilterEvaluator : IEvaluator
 {
-	public IQueryable<TEntity> Evaluate<TEntity>(IQueryable<TEntity> query, SpecificationBase<TEntity> specification)
-		where TEntity : class
+	public bool IsCriteriaEvaluator => true;
+
+	public IQueryable<T> EvaluateQuery<T>(IQueryable<T> query, ISpecification<T> specification)
+		where T : class
 	{
 		foreach (var filter in specification.FilterExpressions)
+		{
 			query = query.Where(filter.Expression);
+		}
 
 		return query;
 	}

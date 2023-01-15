@@ -1,9 +1,9 @@
-﻿using DotnetCoreTemplate.Application.Shared.Specification;
+﻿using DotnetCoreTemplate.Application.Shared.Specifications;
 using DotnetCoreTemplate.Domain.Entities;
 
 namespace DotnetCoreTemplate.Application.Users.GetUserById;
 
-public class UserByIdProjectSpecification : ProjectSpecificationBase<User, UserDto>
+public class UserByIdProjectSpecification : SpecificationBase<User, UserDto>
 {
 	public UserByIdProjectSpecification(string userId)
 	{

@@ -1,4 +1,4 @@
-﻿using DotnetCoreTemplate.Application.Shared.Specification;
+﻿using DotnetCoreTemplate.Application.Shared.Specifications;
 using DotnetCoreTemplate.Domain.Entities;
 
 namespace DotnetCoreTemplate.Application.TodoItems.Specification;

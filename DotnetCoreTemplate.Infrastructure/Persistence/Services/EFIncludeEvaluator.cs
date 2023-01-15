@@ -1,16 +1,17 @@
-﻿using DotnetCoreTemplate.Application.Shared.Specification;
-using DotnetCoreTemplate.Application.Shared.Specification.Enums;
-using DotnetCoreTemplate.Application.Shared.Specification.Expressions;
-using DotnetCoreTemplate.Infrastructure.Persistence.Interfaces;
+﻿using DotnetCoreTemplate.Application.Shared.Specifications.Enums;
+using DotnetCoreTemplate.Application.Shared.Specifications.Expressions;
+using DotnetCoreTemplate.Application.Shared.Specifications.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace DotnetCoreTemplate.Infrastructure.Persistence.Services;
 
 public class EFIncludeEvaluator : IEvaluator
 {
-	private const string ErrorMsg = "'{0}' cannot be empty when '{1}' is set to '{2}'";
+	private const string MissingExpressionErrorMsg = "'{0}' cannot be empty when include type is set to '{1}'";
 
-	public IQueryable<TEntity> Evaluate<TEntity>(IQueryable<TEntity> query, SpecificationBase<TEntity> specification)
+	public bool IsCriteriaEvaluator => false;
+
+	public IQueryable<TEntity> EvaluateQuery<TEntity>(IQueryable<TEntity> query, ISpecification<TEntity> specification)
 		where TEntity : class
 	{
 		foreach (var include in specification.IncludeExpressions)
@@ -24,28 +25,31 @@ public class EFIncludeEvaluator : IEvaluator
 	private static IQueryable<TEntity> Include<TEntity>(IQueryable<TEntity> query, IncludeExpression<TEntity> include)
 		where TEntity : class
 	{
-		switch (include.Type)
+		return include.Type switch
 		{
-			case IncludeType.String:
-				if (string.IsNullOrEmpty(include.StringExpression))
-					throw new ArgumentNullException(
-						string.Format(ErrorMsg, include.StringExpression, include.Type, IncludeType.String));
+			IncludeType.String => IncludeString(query, include),
+			IncludeType.LINQ => IncludeLinq(query, include),
+			_ => throw new NotImplementedException(),
+		};
+	}
 
-				query = query.Include(include.StringExpression);
-				break;
+	private static IQueryable<TEntity> IncludeLinq<TEntity>(IQueryable<TEntity> query,
+		IncludeExpression<TEntity> include) where TEntity : class
+	{
+		if (include.LinqExpression == null)
+			throw new ArgumentNullException(
+				string.Format(MissingExpressionErrorMsg, include.LinqExpression, IncludeType.LINQ));
 
-			case IncludeType.LINQ:
-				if (include.LinqExpression == null)
-					throw new ArgumentNullException(
-						string.Format(ErrorMsg, include.LinqExpression, include.Type, IncludeType.LINQ));
+		return query.Include(include.LinqExpression);
+	}
 
-				query = query.Include(include.LinqExpression);
-				break;
+	private static IQueryable<TEntity> IncludeString<TEntity>(IQueryable<TEntity> query,
+		IncludeExpression<TEntity> include) where TEntity : class
+	{
+		if (string.IsNullOrEmpty(include.StringExpression))
+			throw new ArgumentNullException(
+				string.Format(MissingExpressionErrorMsg, include.StringExpression, IncludeType.String));
 
-			default:
-				throw new NotImplementedException();
-		}
-
-		return query;
+		return query.Include(include.StringExpression);
 	}
 }

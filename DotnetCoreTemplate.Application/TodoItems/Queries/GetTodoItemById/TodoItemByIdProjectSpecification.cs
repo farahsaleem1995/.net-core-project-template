@@ -1,9 +1,9 @@
-﻿using DotnetCoreTemplate.Application.Shared.Specification;
+﻿using DotnetCoreTemplate.Application.Shared.Specifications;
 using DotnetCoreTemplate.Domain.Entities;
 
 namespace DotnetCoreTemplate.Application.TodoItems.Queries.GetTodoItemById;
 
-public class TodoItemByIdProjectSpecification : ProjectSpecificationBase<TodoItem, TodoItemDto>
+public class TodoItemByIdProjectSpecification : SpecificationBase<TodoItem, TodoItemDto>
 {
 	public TodoItemByIdProjectSpecification(int todoItemId)
 	{

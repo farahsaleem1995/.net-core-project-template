@@ -1,13 +1,14 @@
-﻿using DotnetCoreTemplate.Application.Shared.Specification;
-using DotnetCoreTemplate.Application.Shared.Specification.Enums;
-using DotnetCoreTemplate.Application.Shared.Specification.Expressions;
-using DotnetCoreTemplate.Infrastructure.Persistence.Interfaces;
+﻿using DotnetCoreTemplate.Application.Shared.Specifications.Enums;
+using DotnetCoreTemplate.Application.Shared.Specifications.Expressions;
+using DotnetCoreTemplate.Application.Shared.Specifications.Interfaces;
 
 namespace DotnetCoreTemplate.Infrastructure.Persistence.Services;
 
 public class EFOrderEvaluator : IEvaluator
 {
-	public IQueryable<TEntity> Evaluate<TEntity>(IQueryable<TEntity> query, SpecificationBase<TEntity> specification)
+	public bool IsCriteriaEvaluator => false;
+
+	public IQueryable<TEntity> EvaluateQuery<TEntity>(IQueryable<TEntity> query, ISpecification<TEntity> specification)
 		where TEntity : class
 	{
 		foreach (var order in specification.OrderExpressions)
@@ -21,20 +22,32 @@ public class EFOrderEvaluator : IEvaluator
 	private static IQueryable<TEntity> Order<TEntity>(IQueryable<TEntity> query, OrderExpression<TEntity> order)
 		where TEntity : class
 	{
-		if (order.Direction == OrderDirection.Ascending)
+		return order.Direction switch
 		{
-			if (IsOrdered(query))
-				query = AsOrdered(query).ThenBy(order.Expression);
-			else
-				query = query.OrderBy(order.Expression);
-		}
-		else if (order.Direction == OrderDirection.Descending)
-		{
-			if (IsOrdered(query))
-				query = AsOrdered(query).ThenByDescending(order.Expression);
-			else
-				query = query.OrderByDescending(order.Expression);
-		}
+			OrderDirection.Ascending => OrderAscending(query, order),
+			OrderDirection.Descending => OrderDescending(query, order),
+			_ => throw new NotImplementedException(),
+		};
+	}
+
+	private static IQueryable<TEntity> OrderDescending<TEntity>(IQueryable<TEntity> query,
+		OrderExpression<TEntity> order) where TEntity : class
+	{
+		if (IsOrdered(query))
+			query = AsOrdered(query).ThenByDescending(order.Expression);
+		else
+			query = query.OrderByDescending(order.Expression);
+
+		return query;
+	}
+
+	private static IQueryable<TEntity> OrderAscending<TEntity>(IQueryable<TEntity> query,
+		OrderExpression<TEntity> order) where TEntity : class
+	{
+		if (IsOrdered(query))
+			query = AsOrdered(query).ThenBy(order.Expression);
+		else
+			query = query.OrderBy(order.Expression);
 
 		return query;
 	}

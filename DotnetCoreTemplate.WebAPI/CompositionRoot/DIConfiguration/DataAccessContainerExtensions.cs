@@ -1,7 +1,6 @@
 ﻿using DotnetCoreTemplate.Application.Shared.Interfaces;
-using DotnetCoreTemplate.Infrastructure.Persistence.Interfaces;
+using DotnetCoreTemplate.Application.Shared.Specifications.Interfaces;
 using DotnetCoreTemplate.Infrastructure.Persistence.Services;
-using DotnetCoreTemplate.WebAPI.CompositionRoot.Composites;
 using SimpleInjector;
 
 namespace DotnetCoreTemplate.WebAPI.CompositionRoot.DIConfiguration;
@@ -16,15 +15,13 @@ public static class DataAccessContainerExtensions
 
 		container.Collection.Register<IEvaluator>(new[]
 		{
-			Lifestyle.Transient.CreateRegistration(typeof(EFFilterEvaluator), container),
 			Lifestyle.Transient.CreateRegistration(typeof(EFIncludeEvaluator), container),
+			Lifestyle.Transient.CreateRegistration(typeof(EFFilterEvaluator), container),
 			Lifestyle.Transient.CreateRegistration(typeof(EFOrderEvaluator), container),
+			Lifestyle.Transient.CreateRegistration(typeof(EFPaginationEvaluator), container),
 		});
-		container.Register<IEvaluator, CompositeSpecificationEvaluator>();
 
-		container.Register<IProjector, EFProjector>();
-
-		container.Register<IPaginator, EFPaginator>();
+		container.Register<ISpecificationEvaluator, EFSpecificationEvaluator>();
 
 		return container;
 	}

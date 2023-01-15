@@ -1,6 +1,6 @@
 ﻿namespace DotnetCoreTemplate.Application.Shared.Models;
 
-public record PaginatedList<T>(List<T> Items, int TotalItems, int PageNumber, byte PageSize)
+public record PaginatedList<T>(List<T> Items, int TotalItems, int PageNumber, int PageSize)
 {
 	public int TotalPages => (int)Math.Ceiling(TotalItems / (double)PageSize);
 
