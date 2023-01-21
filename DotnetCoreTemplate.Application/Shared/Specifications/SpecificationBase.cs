@@ -1,4 +1,5 @@
-﻿using DotnetCoreTemplate.Application.Shared.Specifications.Enums;
+﻿using AutoMapper;
+using DotnetCoreTemplate.Application.Shared.Specifications.Enums;
 using DotnetCoreTemplate.Application.Shared.Specifications.Expressions;
 using DotnetCoreTemplate.Application.Shared.Specifications.Interfaces;
 using System.Linq.Expressions;
@@ -22,6 +23,11 @@ public abstract class SpecificationBase<T, TOut> : SpecificationBase<T>, ISpecif
 	public void Project(Expression<Func<T, TOut>> expression)
 	{
 		ProjectExpression = new ProjectExpression<T, TOut>(expression);
+	}
+
+	public void Project(IConfigurationProvider configuration)
+	{
+		ProjectExpression = new ProjectExpression<T, TOut>(configuration);
 	}
 }
 

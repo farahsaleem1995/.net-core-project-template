@@ -1,15 +1,15 @@
-﻿using DotnetCoreTemplate.Application.Shared.Specifications;
+﻿using AutoMapper;
+using DotnetCoreTemplate.Application.Shared.Specifications;
 using DotnetCoreTemplate.Domain.Entities;
 
 namespace DotnetCoreTemplate.Application.TodoItems.Queries.GetTodoItemById;
 
 public class TodoItemByIdProjectSpecification : SpecificationBase<TodoItem, TodoItemDto>
 {
-	public TodoItemByIdProjectSpecification(int todoItemId)
+	public TodoItemByIdProjectSpecification(int todoItemId, IMapper mapper)
 	{
 		WithFilter(t => t.Id == todoItemId);
 
-		Project(t => new TodoItemDto(
-			t.Id, t.Title, t.Description, t.Status, t.CreatedDate, t.LastUpdatedDate));
+		Project(mapper.ConfigurationProvider);
 	}
 }

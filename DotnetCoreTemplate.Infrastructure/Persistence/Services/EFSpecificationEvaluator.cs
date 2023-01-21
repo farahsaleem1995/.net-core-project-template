@@ -53,9 +53,9 @@ public class EFSpecificationEvaluator : ISpecificationEvaluator
 	private static IQueryable<TOut> Map<T, TOut>(IQueryable<T> query, ISpecification<T, TOut> specification)
 		where T : class
 	{
-		const string ErrorMsg = "Specification of type '{0}' does not specify a select expression.";
+		const string ErrorMsg = "Specification of type '{0}' does not specify a mapping configuration.";
 
-		if (specification.ProjectExpression.Expression == null)
+		if (specification.ProjectExpression.Configuration == null)
 		{
 			throw new InvalidOperationException(string.Format(ErrorMsg, specification.GetType()));
 		}
@@ -66,7 +66,7 @@ public class EFSpecificationEvaluator : ISpecificationEvaluator
 	private static IQueryable<TOut> Select<T, TOut>(IQueryable<T> query, ISpecification<T, TOut> specification)
 		where T : class
 	{
-		const string ErrorMsg = "Specification of type '{0}' does not specify a mapping configuration.";
+		const string ErrorMsg = "Specification of type '{0}' does not specify a select expression.";
 
 		if (specification.ProjectExpression.Expression == null)
 		{
