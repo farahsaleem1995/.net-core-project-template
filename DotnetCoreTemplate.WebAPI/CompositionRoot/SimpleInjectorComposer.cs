@@ -6,33 +6,28 @@ using SimpleInjector.Integration.ServiceCollection;
 
 namespace DotnetCoreTemplate.WebAPI.CompositionRoot;
 
-public class SimpleInjectorServiceConfigurator
+public class SimpleInjectorComposer
 {
-	private readonly IServiceCollection _services;
-	private readonly IConfiguration _configuration;
 	private readonly Container _container;
+	private readonly IServiceCollection _services;
 
-	public SimpleInjectorServiceConfigurator(
-		IServiceCollection services,
-		IConfiguration configuration,
-		Container container)
+	public SimpleInjectorComposer(IServiceCollection services)
 	{
+		_container = new Container();
 		_services = services;
-		_configuration = configuration;
-		_container = container;
 	}
 
-	public void Configure()
+	public void Compose(IConfiguration configuration)
 	{
-		_container.IntegrateWithServiceCollection(_services, _configuration, SetupSimpleInjector)
+		_container.IntegrateWithServiceCollection(_services, configuration, SetupSimpleInjector)
 			.RegisterDomainServices()
 			.RegisterDataAccess()
-			.RegisterIdentity(_configuration)
+			.RegisterIdentity(configuration)
 			.RegisterUtilities()
 			.RegisterBackgroundServices();
 	}
 
-	public void SetupSimpleInjector(SimpleInjectorAddOptions options)
+	private void SetupSimpleInjector(SimpleInjectorAddOptions options)
 	{
 		options.AddAspNetCore()
 			.AddControllerActivation()
@@ -44,5 +39,17 @@ public class SimpleInjectorServiceConfigurator
 		options.AddLocalization();
 
 		options.AddHostedService<DefaultHostedService<WorkQueueProcessor>>();
+	}
+
+	public void IntegrateWithServiceProvider(IServiceProvider serviceProvider)
+	{
+		serviceProvider.UseSimpleInjector(_container);
+
+		_container.Verify();
+	}
+
+	public void DecorateRequestPipeline<TMiddleware>(IApplicationBuilder app)
+	{
+		app.UseMiddleware<TMiddleware>(_container);
 	}
 }

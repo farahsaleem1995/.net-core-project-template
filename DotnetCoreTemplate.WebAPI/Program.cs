@@ -1,20 +1,16 @@
 using DotnetCoreTemplate.WebAPI.CompositionRoot;
+using DotnetCoreTemplate.WebAPI.CompositionRoot.Extensions;
 using DotnetCoreTemplate.WebAPI.Middlewares;
-using SimpleInjector;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+var composer = new SimpleInjectorComposer(builder.Services);
 
-var container = new Container();
-var configurator = new SimpleInjectorServiceConfigurator(builder.Services, builder.Configuration, container);
-configurator.Configure();
+composer.Compose(builder.Configuration);
 
 var app = builder.Build();
 
-app.Services.UseSimpleInjector(container);
-
-container.Verify();
+app.Services.UseComposer(composer);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -29,6 +25,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.UseMiddleware<ExceptionHandlingMiddleware>(container);
+app.UseMiddleware<ExceptionHandlingMiddleware>(composer);
 
 app.Run();
