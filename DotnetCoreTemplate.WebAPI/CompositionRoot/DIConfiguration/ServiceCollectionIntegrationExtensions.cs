@@ -23,7 +23,7 @@ public static class ServiceCollectionIntegrationExtensions
 		IConfiguration configuration,
 		Action<SimpleInjectorAddOptions> setupAction)
 	{
-		services.AddWebApi();
+		services.AddWebApi(configuration);
 		services.AddDataAceess(configuration);
 		services.AddIdentity();
 		services.AddAuthentication(configuration);
@@ -38,7 +38,7 @@ public static class ServiceCollectionIntegrationExtensions
 		return container;
 	}
 
-	private static void AddWebApi(this IServiceCollection services)
+	private static void AddWebApi(this IServiceCollection services, IConfiguration configuration)
 	{
 		services
 			.AddControllers(options =>
@@ -62,6 +62,18 @@ public static class ServiceCollectionIntegrationExtensions
 		services.AddLocalization(options => options.ResourcesPath = "Resources");
 
 		services.AddSwagger();
+
+		services.AddCors(options =>
+		{
+			options.AddPolicy(configuration["CorsPolicy"] ?? throw new InvalidOperationException("Invalid CORS Configuration"),
+				policy =>
+				{
+					policy.AllowAnyMethod()
+					.AllowAnyHeader()
+					.AllowCredentials()
+					.SetIsOriginAllowed(_ => true);
+				});
+		});
 	}
 
 	private static void AddSwagger(this IServiceCollection services)

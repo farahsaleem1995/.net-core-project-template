@@ -19,6 +19,8 @@ if (app.Environment.IsDevelopment())
 	app.UseSwaggerUI();
 }
 
+app.UseCors(builder.Configuration["CorsPolicy"] ?? throw new InvalidOperationException("Invalid CORS Configuration"));
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
